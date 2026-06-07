@@ -1,0 +1,190 @@
+.hearings-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.view-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.view-tab {
+  padding: 6px 16px;
+  border-radius: calc(var(--radius) - 2px);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.view-tab:hover {
+  color: var(--text);
+}
+
+.view-tab.active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Calendar Styles */
+.calendar-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.calendar-month-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.calendar-nav-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 8px 0;
+}
+
+.calendar-day-cell {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 110px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.calendar-day-cell:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-hover);
+}
+
+.calendar-day-cell.empty {
+  background: transparent;
+  border-color: transparent;
+  pointer-events: none;
+}
+
+.calendar-day-cell.today {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.calendar-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-day-number {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.calendar-day-cell.today .calendar-day-number {
+  color: var(--primary);
+}
+
+.calendar-day-add-btn {
+  opacity: 0;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.calendar-day-cell:hover .calendar-day-add-btn {
+  opacity: 1;
+}
+
+.calendar-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 75px;
+}
+
+/* Custom scrollbar for events */
+.calendar-day-events::-webkit-scrollbar {
+  width: 3px;
+}
+.calendar-day-events::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 2px;
+}
+
+.calendar-event-item {
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary);
+  border-left: 2px solid var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.calendar-event-item:hover {
+  background: rgba(79, 70, 229, 0.22);
+  transform: translateX(2px);
+}
+
+.calendar-event-item.Completed {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  border-left-color: var(--success);
+}
+
+.calendar-event-item.Cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+  border-left-color: var(--danger);
+}

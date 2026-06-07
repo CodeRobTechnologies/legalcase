@@ -1,0 +1,24 @@
+/* App.css – layout shell */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: 240px;
+  transition: margin-left 0.25s ease;
+}
+
+.page-body {
+  flex: 1;
+  padding: 28px 32px;
+}
+
+@media (max-width: 768px) {
+  .main-content { margin-left: 0; }
+  .page-body { padding: 20px 16px; }
+}

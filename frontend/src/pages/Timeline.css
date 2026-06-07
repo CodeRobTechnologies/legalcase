@@ -1,0 +1,182 @@
+.timeline-page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.timeline-search-card {
+  margin-bottom: 24px;
+}
+
+.timeline-search-bar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.timeline-search-input-group {
+  flex: 1;
+}
+
+.case-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.case-info-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.case-info-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Vertical Timeline Layout */
+.timeline-flow {
+  position: relative;
+  margin-left: 24px;
+  padding-left: 32px;
+  border-left: 2px solid var(--border);
+}
+
+/* Connector glow on hover */
+.timeline-flow::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.timeline-event-wrapper {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.timeline-event-wrapper:last-child {
+  margin-bottom: 0;
+}
+
+/* Timeline Dot / Indicator */
+.timeline-event-dot {
+  position: absolute;
+  left: -43px;
+  top: 18px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 0 4px var(--bg);
+}
+
+/* Dynamic dot states based on event types */
+.timeline-event-wrapper.event-registered .timeline-event-dot {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4), 0 0 0 4px var(--bg);
+}
+
+.timeline-event-wrapper.event-scheduled .timeline-event-dot {
+  border-color: var(--info);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4), 0 0 0 4px var(--bg);
+}
+
+.timeline-event-wrapper.event-rescheduled .timeline-event-dot {
+  border-color: var(--warning);
+  background: rgba(245, 158, 11, 0.1);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4), 0 0 0 4px var(--bg);
+}
+
+.timeline-event-wrapper.event-cancelled .timeline-event-dot {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), 0 0 0 4px var(--bg);
+}
+
+.timeline-event-wrapper.event-completed .timeline-event-dot {
+  border-color: var(--secondary);
+  background: rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.4), 0 0 0 4px var(--bg);
+}
+
+/* Event Card styles */
+.timeline-event-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-event-card:hover {
+  transform: translateX(4px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow);
+}
+
+.timeline-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.timeline-event-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.timeline-event-time {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.timeline-event-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  white-space: pre-line;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  border-left: 3px solid var(--border);
+}
+
+/* Dynamic details accent bar based on event state */
+.timeline-event-wrapper.event-registered .timeline-event-desc {
+  border-left-color: var(--success);
+}
+.timeline-event-wrapper.event-scheduled .timeline-event-desc {
+  border-left-color: var(--info);
+}
+.timeline-event-wrapper.event-rescheduled .timeline-event-desc {
+  border-left-color: var(--warning);
+}
+.timeline-event-wrapper.event-cancelled .timeline-event-desc {
+  border-left-color: var(--danger);
+}
+.timeline-event-wrapper.event-completed .timeline-event-desc {
+  border-left-color: var(--secondary);
+}
