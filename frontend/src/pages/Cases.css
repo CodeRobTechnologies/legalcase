@@ -1,0 +1,21 @@
+.cases-page { max-width: 1100px; }
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-input { flex: 1; min-width: 200px; }
+
+.desc-cell {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.row-actions { display: flex; gap: 6px; }
