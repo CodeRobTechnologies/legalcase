@@ -162,6 +162,8 @@ class Case(Base):
 
         "TimelineEvent",
 
+        back_populates="case",
+
         cascade="all, delete-orphan"
     )
 

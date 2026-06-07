@@ -84,9 +84,7 @@ from app.routes.dashboard_routes import (
     router as dashboard_router
 )
 
-from app.routes.websocket_routes import (
-    router as websocket_router
-)
+# Websocket router removed as it is duplicated by notification_routes
 
 from app.routes.page_routes import (
     router as page_router
@@ -194,14 +192,12 @@ app = FastAPI(
 # CORS
 # =========================
 
-origins = os.getenv(
-    "FRONTEND_URL",
-    "http://localhost:5173"
-).split(",")
+origins = [o.strip() for o in os.getenv("FRONTEND_URL", "http://localhost:5173").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -257,7 +253,7 @@ app.include_router(document_router)
 
 app.include_router(dashboard_router)
 
-app.include_router(websocket_router)
+# app.include_router(websocket_router)
 
 app.include_router(page_router)
 
