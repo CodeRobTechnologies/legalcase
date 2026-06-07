@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import (
     FastAPI,
-    Depends
+    Depends,
+    Request
 )
 
 from fastapi.middleware.cors import (
@@ -197,11 +198,21 @@ origins = [o.strip() for o in os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https?://.*",
+    allow_origin_regex=r".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def debug_cors_middleware(request: Request, call_next):
+    if request.method == "OPTIONS":
+        print(f"[CORS Debug] Incoming OPTIONS headers: {dict(request.headers)}")
+    response = await call_next(request)
+    if request.method == "OPTIONS":
+        print(f"[CORS Debug] Outgoing OPTIONS response status: {response.status_code}")
+        print(f"[CORS Debug] Outgoing OPTIONS headers: {dict(response.headers)}")
+    return response
 
 
 
