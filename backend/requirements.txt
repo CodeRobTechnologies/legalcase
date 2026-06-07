@@ -10,3 +10,4 @@ pydantic
 pydantic-settings
 email-validator
 twilio
+jinja2
