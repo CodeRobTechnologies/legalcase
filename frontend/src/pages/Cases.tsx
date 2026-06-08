@@ -19,6 +19,7 @@ type Case = {
   client_name?: string | null;
   client_mobile?: string | null;
   clients?: Client[];
+  created_at?: string;
 };
 
 type ClientForm = {
@@ -61,6 +62,13 @@ export default function Cases() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
+  // View Details Modal state
+  const [viewCase, setViewCase] = useState<Case | null>(null);
+  const [viewHearings, setViewHearings] = useState<any[]>([]);
+  const [viewTimeline, setViewTimeline] = useState<any[]>([]);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [viewError, setViewError] = useState('');
+
   const fetchCases = async () => {
     setLoading(true);
     try {
@@ -70,6 +78,32 @@ export default function Cases() {
       setError('Failed to load cases.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openView = async (c: Case) => {
+    setViewCase(c);
+    setViewLoading(true);
+    setViewError('');
+    setViewHearings([]);
+    setViewTimeline([]);
+    try {
+      const [timelineRes, hearingsRes] = await Promise.all([
+        api.get(`/timeline/${c.id}`),
+        api.get('/hearings/')
+      ]);
+      if (timelineRes.data && timelineRes.data.timeline) {
+        setViewTimeline(timelineRes.data.timeline);
+      }
+      if (hearingsRes.data && Array.isArray(hearingsRes.data)) {
+        const filteredHearings = hearingsRes.data.filter((h: any) => h.case_id === c.id);
+        setViewHearings(filteredHearings);
+      }
+    } catch (err) {
+      console.error('Failed to load case details:', err);
+      setViewError('Failed to load related hearings or timeline details.');
+    } finally {
+      setViewLoading(false);
     }
   };
 
@@ -232,6 +266,7 @@ export default function Cases() {
                   <td>{c.lawyer_id ?? '—'}</td>
                   <td>
                     <div className="row-actions">
+                      <button className="btn btn-secondary btn-sm" onClick={() => openView(c)}>View</button>
                       <button className="btn btn-secondary btn-sm" onClick={() => openEdit(c)}>Edit</button>
                       <button className="btn btn-danger btn-sm" onClick={() => setDelCase(c)}>Delete</button>
                     </div>
@@ -358,6 +393,164 @@ export default function Cases() {
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setDelCase(null)}>Cancel</button>
               <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Case Details Modal */}
+      {viewCase && (
+        <div className="modal-overlay" onClick={() => setViewCase(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 750, width: '95%', maxHeight: '85vh', display: 'flex', flexDirection: 'column', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexShrink: 0 }}>
+              <div>
+                <h2 className="modal-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  {viewCase.case_title}
+                  <span className={`badge ${statusClass(viewCase.case_status)}`}>{viewCase.case_status}</span>
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>
+                  Case Number: {viewCase.case_number || '—'} | ID: #{viewCase.id}
+                </p>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setViewCase(null)} 
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 24, cursor: 'pointer', lineHeight: 1, padding: '4px' }}
+              >
+                &times;
+              </button>
+            </div>
+
+            {viewError && <div className="alert alert-error" style={{ flexShrink: 0 }}>{viewError}</div>}
+
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16, paddingRight: 4 }}>
+              {viewLoading ? (
+                <div className="empty-state" style={{ padding: '60px 0' }}><span className="spin" style={{ fontSize: 32 }}>⟳</span></div>
+              ) : (
+                <>
+                  {/* General Info & Description */}
+                  <div className="card" style={{ padding: 18, background: 'rgba(255,255,255,0.01)' }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>General Information</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                      <div>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block' }}>Lawyer ID</span>
+                        <strong style={{ fontSize: 14 }}>{viewCase.lawyer_id ?? '—'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block' }}>Created At</span>
+                        <strong style={{ fontSize: 14 }}>
+                          {viewCase.created_at ? new Date(viewCase.created_at).toLocaleDateString([], { dateStyle: 'medium' }) : '—'}
+                        </strong>
+                      </div>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>Description</span>
+                      <p style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+                        {viewCase.case_description || 'No description provided.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Clients Section */}
+                  <div className="card" style={{ padding: 18, background: 'rgba(255,255,255,0.01)' }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>Client Details</h3>
+                    {viewCase.clients && viewCase.clients.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {viewCase.clients.map((cl, i) => (
+                          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < viewCase.clients!.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                            <span style={{ fontWeight: 500 }}>{cl.client_name}</span>
+                            <span style={{ color: 'var(--text-muted)' }}>{cl.mobile_number || '—'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 500 }}>{viewCase.client_name || '—'}</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{viewCase.client_mobile || '—'}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hearings Section */}
+                  <div className="card" style={{ padding: 18, background: 'rgba(255,255,255,0.01)' }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>Hearings</h3>
+                    {viewHearings.length === 0 ? (
+                      <div style={{ color: 'var(--text-muted)', fontSize: 13, fontStyle: 'italic', padding: '4px 0' }}>
+                        No hearings scheduled for this case.
+                      </div>
+                    ) : (
+                      <div className="table-wrapper" style={{ border: 'none' }}>
+                        <table style={{ minWidth: '100%' }}>
+                          <thead>
+                            <tr style={{ background: 'transparent' }}>
+                              <th style={{ padding: '8px 0', fontSize: 11 }}>Date & Time</th>
+                              <th style={{ padding: '8px 0', fontSize: 11 }}>Location</th>
+                              <th style={{ padding: '8px 0', fontSize: 11, textAlign: 'right' }}>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {viewHearings.map((h, i) => (
+                              <tr key={h.id} style={{ background: 'transparent', borderBottom: i < viewHearings.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                                <td style={{ padding: '10px 0', fontSize: 13 }}>
+                                  {h.hearing_date ? new Date(h.hearing_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '—'}
+                                </td>
+                                <td style={{ padding: '10px 0', fontSize: 13, color: 'var(--text-muted)' }}>{h.location}</td>
+                                <td style={{ padding: '10px 0', fontSize: 13, textAlign: 'right' }}>
+                                  <span className={`badge ${{ Scheduled: 'badge-open', Completed: 'badge-active', Cancelled: 'badge-closed' }[h.status as string] ?? 'badge-open'}`} style={{ fontSize: 11, padding: '1px 8px' }}>
+                                    {h.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Timeline Events Section */}
+                  <div className="card" style={{ padding: 18, background: 'rgba(255,255,255,0.01)' }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>Timeline History</h3>
+                    {viewTimeline.length === 0 ? (
+                      <div style={{ color: 'var(--text-muted)', fontSize: 13, fontStyle: 'italic', padding: '4px 0' }}>
+                        No timeline history recorded.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingLeft: 14, borderLeft: '2px solid var(--border)', margin: '6px 0 6px 6px' }}>
+                        {viewTimeline.map((evt) => (
+                          <div key={evt.id} style={{ position: 'relative' }}>
+                            {/* Timeline dot */}
+                            <div style={{
+                              position: 'absolute',
+                              left: -20,
+                              top: 4,
+                              width: 10,
+                              height: 10,
+                              borderRadius: '50%',
+                              background: 'var(--primary)',
+                              border: '2px solid var(--bg-card)'
+                            }} />
+                            
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                              <strong style={{ fontSize: 13, color: 'var(--text)' }}>{evt.title}</strong>
+                              <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>
+                                {evt.created_at ? new Date(evt.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : ''}
+                              </span>
+                            </div>
+                            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>
+                              {evt.description}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: 16, flexShrink: 0 }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setViewCase(null)}>Close</button>
             </div>
           </div>
         </div>
