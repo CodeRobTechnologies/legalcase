@@ -3,7 +3,8 @@ from fastapi import (
     Depends,
     HTTPException,
     status,
-    Body, Response
+    Body, Response,
+    Request
 )
 
 from fastapi.security import (
@@ -136,12 +137,37 @@ class LoginRequest(BaseModel):
     password: str
 
 @router.post("/login")
-def login(
-    login_data: LoginRequest,
+async def login(
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    content_type = request.headers.get("content-type", "")
+    username = None
+    password = None
+
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            username = body.get("username") or body.get("email")
+            password = body.get("password")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid JSON body")
+    else:
+        try:
+            form_data = await request.form()
+            username = form_data.get("username")
+            password = form_data.get("password")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid form data")
+
+    if not username or not password:
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["body"], "msg": "Username and password are required", "type": "value_error"}]
+        )
+
     db_user = db.query(User).filter(
-        User.email == login_data.username
+        User.email == username
     ).first()
 
     # USER NOT FOUND
@@ -153,7 +179,7 @@ def login(
 
     # INVALID PASSWORD
     if not verify_password(
-        login_data.password,
+        password,
         db_user.password
     ):
         raise HTTPException(

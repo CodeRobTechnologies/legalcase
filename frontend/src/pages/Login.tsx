@@ -28,8 +28,18 @@ export default function Login() {
         setError('Token not found in response.');
       }
     } catch (err) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error.response?.data?.detail || 'Login failed. Please check your credentials.');
+      const error = err as any;
+      const detail = error.response?.data?.detail;
+      if (typeof detail === 'string') {
+        setError(detail);
+      } else if (Array.isArray(detail)) {
+        const msg = detail.map((d: any) => `${d.loc ? d.loc.join('.') : 'field'}: ${d.msg}`).join(', ');
+        setError(msg || 'Validation error');
+      } else if (detail && typeof detail === 'object') {
+        setError(JSON.stringify(detail));
+      } else {
+        setError(error.response?.data?.message || error.message || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
