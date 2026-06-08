@@ -2,7 +2,7 @@
 // The backend issues a stateless JWT (no server cookie), so the session limit
 // is enforced here by reading the token's `exp` claim.
 
-const TOKEN_KEY = 'access_token';
+const TOKEN_KEY = 'token';
 
 type JwtPayload = { exp?: number; user_id?: number; email?: string; role?: string };
 

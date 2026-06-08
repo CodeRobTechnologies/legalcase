@@ -15,10 +15,22 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', { username: email, password });
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const res = await api.post(
+        '/auth/login',
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        }
+      );
       const token = res.data.access_token || res.data.token;
       if (token) {
-        localStorage.setItem('access_token', token);
+        localStorage.setItem('token', token);
         if (res.data.user) {
           localStorage.setItem('user_id', String(res.data.user.id));
           localStorage.setItem('user_email', res.data.user.email);
