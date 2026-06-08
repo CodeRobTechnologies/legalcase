@@ -159,7 +159,7 @@ export default function Documents() {
                     <div style={{display:'flex',gap:6}}>
                       <a
                         className="btn btn-secondary btn-sm"
-                        href={`/api/documents/download/${d.id}?token=${sessionStorage.getItem('access_token')}`}
+                        href={`${import.meta.env.VITE_API_URL || ''}/documents/download/${d.id}?token=${sessionStorage.getItem('access_token')}`}
                         target="_blank"
                         rel="noreferrer"
                       >
