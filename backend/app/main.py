@@ -210,17 +210,11 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def debug_cors_middleware(request: Request, call_next):
-    if os.getenv("ENV") == "dev" and request.method == "OPTIONS":
-        headers = dict(request.headers)
-        headers.pop("authorization", None)
-        print(f"[CORS Debug] Incoming OPTIONS headers: {headers}")
+async def log_requests_middleware(request: Request, call_next):
+    client_host = request.client.host if request.client else "unknown"
+    print(f"[API Request] {request.method} -> {request.url.path} (Client: {client_host})")
     response = await call_next(request)
-    if os.getenv("ENV") == "dev" and request.method == "OPTIONS":
-        headers = dict(response.headers)
-        headers.pop("authorization", None)
-        print(f"[CORS Debug] Outgoing OPTIONS response status: {response.status_code}")
-        print(f"[CORS Debug] Outgoing OPTIONS headers: {headers}")
+    print(f"[API Response] {request.method} -> {request.url.path} | Status: {response.status_code}")
     return response
 
 

@@ -1,9 +1,17 @@
 import axios from 'axios';
 import { getToken, clearSession } from '../lib/auth';
 
+let rawUrl = import.meta.env.VITE_API_URL || '';
+if (rawUrl) {
+  rawUrl = rawUrl.trim();
+  if (!/^https?:\/\//i.test(rawUrl)) {
+    rawUrl = `https://${rawUrl}`;
+  }
+}
+
 const apiBaseUrl = (
-  import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5000' : '')
-).trim().replace(/\/$/, '');
+  rawUrl || (import.meta.env.DEV ? 'http://127.0.0.1:5000' : '')
+).replace(/\/$/, '');
 
 if (!apiBaseUrl) {
   console.warn(

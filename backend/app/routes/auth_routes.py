@@ -128,122 +128,40 @@ def register_user(
 
 
 # =========================
-# LOGIN USER
+# LOGIN SCHEMA AND ROUTE
 # =========================
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 @router.post("/login")
-
-# NOTE: The login endpoint expects form‑urlencoded data (OAuth2PasswordRequestForm).
-# For clients that send JSON, use the /login-json endpoint added below.
 def login(
-
-    form_data: OAuth2PasswordRequestForm = Depends(),
-
+    login_data: LoginRequest,
     db: Session = Depends(get_db)
 ):
-
     db_user = db.query(User).filter(
-
-        User.email == form_data.username
-
+        User.email == login_data.username
     ).first()
-
-
 
     # USER NOT FOUND
     if not db_user:
-
         raise HTTPException(
-
             status_code=404,
-
             detail="User not found"
         )
 
-
-
     # INVALID PASSWORD
     if not verify_password(
-
-        form_data.password,
-
+        login_data.password,
         db_user.password
     ):
-
         raise HTTPException(
-
             status_code=401,
-
             detail="Invalid password"
         )
 
-
-
     # CREATE JWT TOKEN
-    access_token = create_access_token(
-
-        data={
-
-            "user_id":
-            db_user.id,
-
-            "email":
-            db_user.email,
-
-            "role":
-            db_user.role
-        }
-    )
-
-
-
-    return {
-
-        "message":
-        "Login successful",
-
-        "access_token":
-        access_token,
-
-        "token_type":
-        "bearer",
-
-        "user": {
-
-            "id":
-            db_user.id,
-
-            "full_name":
-            db_user.full_name,
-
-            "email":
-            db_user.email,
-
-            "role":
-            db_user.role
-        }
-    }
-
-
-
-# =========================
-# LOGIN USER (JSON)
-# =========================
-@router.post("/login-json")
-def login_json(
-    user: UserLogin,
-    db: Session = Depends(get_db)
-):
-    db_user = db.query(User).filter(
-        User.email == user.email
-    ).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    if not verify_password(
-        user.password,
-        db_user.password
-    ):
-        raise HTTPException(status_code=401, detail="Invalid password")
     access_token = create_access_token(
         data={
             "user_id": db_user.id,
@@ -251,6 +169,7 @@ def login_json(
             "role": db_user.role
         }
     )
+
     return {
         "message": "Login successful",
         "access_token": access_token,

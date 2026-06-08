@@ -15,7 +15,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/login-json', { email, password });
+      const res = await api.post('/auth/login', { username: email, password });
       const token = res.data.access_token || res.data.token;
       if (token) {
         localStorage.setItem('access_token', token);

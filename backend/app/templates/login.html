@@ -290,10 +290,10 @@ async function loginUser(event){
                 headers:{
 
                     "Content-Type":
-                    "application/x-www-form-urlencoded"
+                    "application/json"
                 },
 
-                body:new URLSearchParams({
+                body:JSON.stringify({
 
                     username:email,
 

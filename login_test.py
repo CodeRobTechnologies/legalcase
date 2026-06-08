@@ -17,7 +17,7 @@ payload = {
     'password': password
 }
 
-response = requests.post(login_url, data=payload)
+response = requests.post(login_url, json=payload)
 print('Status code:', response.status_code)
 try:
     json_resp = response.json()
