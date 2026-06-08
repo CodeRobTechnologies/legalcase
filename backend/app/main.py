@@ -198,7 +198,6 @@ origins = [o.strip() for o in os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -206,13 +205,18 @@ app.add_middleware(
 
 @app.middleware("http")
 async def debug_cors_middleware(request: Request, call_next):
-    if request.method == "OPTIONS":
-        print(f"[CORS Debug] Incoming OPTIONS headers: {dict(request.headers)}")
+    if os.getenv("ENV") == "dev" and request.method == "OPTIONS":
+        headers = dict(request.headers)
+        headers.pop("authorization", None)
+        print(f"[CORS Debug] Incoming OPTIONS headers: {headers}")
     response = await call_next(request)
-    if request.method == "OPTIONS":
+    if os.getenv("ENV") == "dev" and request.method == "OPTIONS":
+        headers = dict(response.headers)
+        headers.pop("authorization", None)
         print(f"[CORS Debug] Outgoing OPTIONS response status: {response.status_code}")
-        print(f"[CORS Debug] Outgoing OPTIONS headers: {dict(response.headers)}")
+        print(f"[CORS Debug] Outgoing OPTIONS headers: {headers}")
     return response
+
 
 
 

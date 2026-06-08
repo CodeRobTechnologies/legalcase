@@ -64,6 +64,24 @@ export default function Documents() {
     } catch { alert('Failed to delete document.'); }
   };
 
+  const handleOpen = async (id: number, filename: string) => {
+    try {
+      const res = await api.get(`/documents/download/${id}`, {
+        responseType: 'blob'
+      });
+      const fileType = filename.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream';
+      const headerContentType = res.headers['content-type'];
+      const contentType = typeof headerContentType === 'string' ? headerContentType : fileType;
+      const fileBlob = new Blob([res.data], { type: contentType });
+      const url = window.URL.createObjectURL(fileBlob);
+      window.open(url, '_blank');
+    } catch {
+      alert('Failed to open document.');
+    }
+  };
+
+
+
   return (
     <div style={{maxWidth:900}}>
       <div className="page-header">
@@ -157,14 +175,13 @@ export default function Documents() {
                   <td style={{fontFamily:'monospace',fontSize:13,color:'var(--text-muted)'}}>{d.filename}</td>
                   <td>
                     <div style={{display:'flex',gap:6}}>
-                      <a
+                      <button
                         className="btn btn-secondary btn-sm"
-                        href={`${import.meta.env.VITE_API_URL || ''}/documents/download/${d.id}?token=${sessionStorage.getItem('access_token')}`}
-                        target="_blank"
-                        rel="noreferrer"
+                        onClick={() => handleOpen(d.id, d.filename)}
                       >
                         👁 Open
-                      </a>
+                      </button>
+
                       <button className="btn btn-danger btn-sm" onClick={() => setDelDoc(d)}>Delete</button>
                     </div>
                   </td>

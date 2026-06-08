@@ -5,7 +5,6 @@ class UserCreate(BaseModel):
     full_name: str
     email: EmailStr
     password: str
-    role: str
     phone_number: str
 
 

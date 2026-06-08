@@ -93,14 +93,36 @@ def create_case(
     user_id = user_data.get("user_id")
     assigned_lawyer_id = user_id if role == "lawyer" else case.lawyer_id
 
-    client_id = case.client_id
-    if case.client_name:
+    clients_to_associate = []
+
+    if case.clients:
+        if len(case.clients) > 15:
+            raise HTTPException(status_code=400, detail="Maximum of 15 clients can be added for one case.")
+        for c_data in case.clients:
+            if not c_data.client_name:
+                continue
+            existing_client = db.query(Client).filter(
+                Client.client_name == c_data.client_name,
+                Client.mobile_number == c_data.mobile_number
+            ).first()
+            if existing_client:
+                clients_to_associate.append(existing_client)
+            else:
+                new_client = Client(
+                    client_name=c_data.client_name,
+                    mobile_number=c_data.mobile_number
+                )
+                db.add(new_client)
+                db.commit()
+                db.refresh(new_client)
+                clients_to_associate.append(new_client)
+    elif case.client_name:
         existing_client = db.query(Client).filter(
             Client.client_name == case.client_name,
             Client.mobile_number == case.client_mobile
         ).first()
         if existing_client:
-            client_id = existing_client.id
+            clients_to_associate.append(existing_client)
         else:
             new_client = Client(
                 client_name=case.client_name,
@@ -109,20 +131,25 @@ def create_case(
             db.add(new_client)
             db.commit()
             db.refresh(new_client)
-            client_id = new_client.id
+            clients_to_associate.append(new_client)
+
+    primary_client_id = clients_to_associate[0].id if clients_to_associate else case.client_id
 
     new_case = Case(
         case_title=case.case_title,
         case_description=case.case_description,
         case_number=case.case_number,
         lawyer_id=assigned_lawyer_id,
-        client_id=client_id,
+        client_id=primary_client_id,
         case_status="Open"
     )
+    if clients_to_associate:
+        new_case.clients = clients_to_associate
 
     db.add(new_case)
     db.commit()
     db.refresh(new_case)
+
 
     # =========================
     # TIMELINE EVENT
@@ -304,37 +331,67 @@ def update_case(
         case.case_status = updated_case.case_status
 
 
-    if updated_case.lawyer_id is not None:
+    if role == "admin":
+        if updated_case.lawyer_id is not None:
+            case.lawyer_id = updated_case.lawyer_id
+        if updated_case.client_id is not None:
+            case.client_id = updated_case.client_id
 
-        case.lawyer_id = updated_case.lawyer_id
-
-    if updated_case.client_id is not None:
-        case.client_id = updated_case.client_id
-
-    if updated_case.client_name is not None or updated_case.client_mobile is not None:
-        if case.client:
-            if updated_case.client_name is not None:
-                case.client.client_name = updated_case.client_name
-            if updated_case.client_mobile is not None:
-                case.client.mobile_number = updated_case.client_mobile
-        else:
-            name = updated_case.client_name or ""
-            mobile = updated_case.client_mobile
+    if updated_case.clients is not None:
+        if len(updated_case.clients) > 15:
+            raise HTTPException(status_code=400, detail="Maximum of 15 clients can be added for one case.")
+        clients_to_associate = []
+        for c_data in updated_case.clients:
+            if not c_data.client_name:
+                continue
             existing_client = db.query(Client).filter(
-                Client.client_name == name,
-                Client.mobile_number == mobile
+                Client.client_name == c_data.client_name,
+                Client.mobile_number == c_data.mobile_number
             ).first()
             if existing_client:
-                case.client_id = existing_client.id
+                clients_to_associate.append(existing_client)
             else:
                 new_client = Client(
-                    client_name=name,
-                    mobile_number=mobile
+                    client_name=c_data.client_name,
+                    mobile_number=c_data.mobile_number
                 )
                 db.add(new_client)
                 db.commit()
                 db.refresh(new_client)
-                case.client_id = new_client.id
+                clients_to_associate.append(new_client)
+        case.clients = clients_to_associate
+        if role == "admin" and clients_to_associate:
+            case.client_id = clients_to_associate[0].id
+        elif role != "admin" and clients_to_associate and case.client_id is None:
+            case.client_id = clients_to_associate[0].id
+    else:
+        if updated_case.client_name is not None or updated_case.client_mobile is not None:
+            if case.client:
+                if updated_case.client_name is not None:
+                    case.client.client_name = updated_case.client_name
+                if updated_case.client_mobile is not None:
+                    case.client.mobile_number = updated_case.client_mobile
+            else:
+                name = updated_case.client_name or ""
+                mobile = updated_case.client_mobile
+                existing_client = db.query(Client).filter(
+                    Client.client_name == name,
+                    Client.mobile_number == mobile
+                ).first()
+                if existing_client:
+                    if role == "admin" or case.client_id is None:
+                        case.client_id = existing_client.id
+                else:
+                    new_client = Client(
+                        client_name=name,
+                        mobile_number=mobile
+                    )
+                    db.add(new_client)
+                    db.commit()
+                    db.refresh(new_client)
+                    if role == "admin" or case.client_id is None:
+                        case.client_id = new_client.id
+
 
     
 

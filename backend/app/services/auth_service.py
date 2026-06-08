@@ -27,6 +27,9 @@ from fastapi.security import (
 )
 
 from dotenv import load_dotenv
+from sqlalchemy.orm import Session
+from app.database import SessionLocal
+from app.models.user_model import User
 
 
 
@@ -44,9 +47,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
-    import secrets
-    SECRET_KEY = secrets.token_hex(32)
-    print("WARNING: SECRET_KEY not found in environment. Generated a secure random key for this session.")
+    raise RuntimeError("SECRET_KEY environment variable is missing!")
 
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
@@ -141,7 +142,13 @@ def create_access_token(
     to_encode.update({
 
         "exp":
-        expire
+        expire,
+
+        "iss":
+        "legalcase-auth",
+
+        "aud":
+        "legalcase-api"
     })
 
 
@@ -181,10 +188,31 @@ def verify_token(
 
             SECRET_KEY,
 
-            algorithms=[ALGORITHM]
+            algorithms=[ALGORITHM],
+
+            audience="legalcase-api",
+
+            issuer="legalcase-auth"
         )
 
+        user_id = payload.get("user_id")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload"
+            )
 
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.id == user_id).first()
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="User not found"
+                )
+            payload["role"] = user.role
+        finally:
+            db.close()
 
         return payload
 
@@ -215,6 +243,7 @@ def verify_token(
             detail=
             "Invalid token"
         )
+
 
 
 

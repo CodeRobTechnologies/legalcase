@@ -198,12 +198,13 @@ Status:
     # SEND WHATSAPP
     # =========================
 
-    client = existing_case.client if existing_case else None
+    clients = existing_case.clients if (existing_case and hasattr(existing_case, 'clients') and existing_case.clients) else ([existing_case.client] if (existing_case and existing_case.client) else [])
 
 
-    if client and client.phone_number:
+    for client in clients:
+        if client and client.phone_number:
 
-        message = f"""
+            message = f"""
 LEGAL HEARING SCHEDULED
 
 Case:
@@ -219,23 +220,24 @@ Status:
 {new_hearing.status}
 """
 
-        try:
+            try:
 
-            send_whatsapp_message(
-                client.phone_number,
-                message
-            )
+                send_whatsapp_message(
+                    client.phone_number,
+                    message
+                )
 
-            print(
-                "WHATSAPP SENT"
-            )
+                print(
+                    "WHATSAPP SENT"
+                )
 
-        except Exception as e:
+            except Exception as e:
 
-            print(
-                "WHATSAPP ERROR:",
-                e
-            )
+                print(
+                    "WHATSAPP ERROR:",
+                    e
+                )
+
 
 
 
@@ -572,11 +574,13 @@ async def update_hearing(
         db.refresh(hearing)
     except IntegrityError as ie:
         db.rollback()
-        detail_msg = f"Database integrity error: {ie.orig}" if ie.orig else str(ie)
-        raise HTTPException(status_code=400, detail=detail_msg)
+        print(f"Database integrity error during hearing update: {ie}")
+        raise HTTPException(status_code=400, detail="Database integrity error: invalid data provided.")
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to update hearing: {e}")
+        print(f"Error during hearing update: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred while updating the hearing.")
+
 
     # Determine Status change notification
     if hearing.status != old_status:
@@ -662,12 +666,13 @@ Status:
     # SEND WHATSAPP
     # =========================
 
-    client = existing_case.client if existing_case else None
+    clients = existing_case.clients if (existing_case and hasattr(existing_case, 'clients') and existing_case.clients) else ([existing_case.client] if (existing_case and existing_case.client) else [])
 
 
-    if client and client.phone_number:
+    for client in clients:
+        if client and client.phone_number:
 
-        message = f"""
+            message = f"""
 LEGAL HEARING UPDATED
 
 Case:
@@ -686,23 +691,24 @@ Status:
 {hearing.status}
 """
 
-        try:
+            try:
 
-            send_whatsapp_message(
-                client.phone_number,
-                message
-            )
+                send_whatsapp_message(
+                    client.phone_number,
+                    message
+                )
 
-            print(
-                "WHATSAPP UPDATE SENT"
-            )
+                print(
+                    "WHATSAPP UPDATE SENT"
+                )
 
-        except Exception as e:
+            except Exception as e:
 
-            print(
-                "WHATSAPP UPDATE ERROR:",
-                e
-            )
+                print(
+                    "WHATSAPP UPDATE ERROR:",
+                    e
+                )
+
 
 
 

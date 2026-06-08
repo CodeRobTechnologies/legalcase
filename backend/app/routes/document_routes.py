@@ -343,18 +343,16 @@ def get_documents(
 # DOWNLOAD DOCUMENT
 # =========================
 
-def verify_token_from_header_or_query(
-    request: Request,
-    token: Optional[str] = Query(None)
+def verify_token_from_header(
+    request: Request
 ):
+    from app.models.user_model import User
     # Try header first
     auth_header = request.headers.get("Authorization")
     actual_token = None
     
     if auth_header and auth_header.startswith("Bearer "):
         actual_token = auth_header.split(" ")[1]
-    elif token:
-        actual_token = token
         
     if not actual_token:
         raise HTTPException(
@@ -366,8 +364,26 @@ def verify_token_from_header_or_query(
         payload = jwt.decode(
             actual_token,
             SECRET_KEY,
-            algorithms=[ALGORITHM]
+            algorithms=[ALGORITHM],
+            audience="legalcase-api",
+            issuer="legalcase-auth"
         )
+        user_id = payload.get("user_id")
+        if not user_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token payload"
+            )
+        
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.id == user_id).first()
+            if not user:
+                raise HTTPException(status_code=401, detail="User not found")
+            payload["role"] = user.role
+        finally:
+            db.close()
+            
         return payload
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
@@ -381,8 +397,9 @@ def download_document(
 
     db: Session = Depends(get_db),
 
-    user_data: dict = Depends(verify_token_from_header_or_query)
+    user_data: dict = Depends(verify_token_from_header)
 ):
+
 
     document = db.query(Document).filter(
         Document.id == document_id

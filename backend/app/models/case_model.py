@@ -5,7 +5,8 @@ from sqlalchemy import (
     String,
     Text,
     DateTime,
-    ForeignKey
+    ForeignKey,
+    Table
 )
 
 from sqlalchemy.sql import (
@@ -17,6 +18,13 @@ from sqlalchemy.orm import relationship
 from app.models.client_model import Client
 
 from app.database import Base
+
+case_client_association = Table(
+    'case_clients',
+    Base.metadata,
+    Column('case_id', Integer, ForeignKey('cases.id', ondelete='CASCADE'), primary_key=True),
+    Column('client_id', Integer, ForeignKey('clients.id', ondelete='CASCADE'), primary_key=True)
+)
 
 
 
@@ -127,6 +135,12 @@ class Case(Base):
     client = relationship(
         "Client",
         foreign_keys=[client_id]
+    )
+
+    clients = relationship(
+        "Client",
+        secondary=case_client_association,
+        passive_deletes=True
     )
 
     @property

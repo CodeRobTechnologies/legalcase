@@ -91,7 +91,7 @@ def register_user(
 
         password=hashed_password,
 
-        role=user.role,
+        role="lawyer",
 
         phone_number=user.phone_number
     )
@@ -373,6 +373,9 @@ def admin_check(
 @router.post("/login-seed", include_in_schema=False)
 def login_seed(db: Session = Depends(get_db)):
     """Return JWT for the first seeded user (development only)."""
+    import os
+    if os.getenv("ENV") != "dev":
+        raise HTTPException(status_code=403, detail="Not allowed in this environment")
     seed_user = db.query(User).first()
     if not seed_user:
         raise HTTPException(status_code=404, detail="No seeded user found")
@@ -388,3 +391,30 @@ def login_seed(db: Session = Depends(get_db)):
             "role": seed_user.role,
         },
     }
+
+# =========================
+# ADMIN ONLY: UPDATE USER ROLE
+# =========================
+@router.put("/users/{user_id}/role")
+def update_user_role(
+    user_id: int,
+    role: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+    admin_user: dict = Depends(verify_token)
+):
+    admin_db_user = db.query(User).filter(User.id == admin_user["user_id"]).first()
+    if not admin_db_user or admin_db_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    
+    target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    target_user.role = role
+    db.commit()
+    db.refresh(target_user)
+    
+    return {"message": "User role updated successfully", "user_id": target_user.id, "new_role": target_user.role}

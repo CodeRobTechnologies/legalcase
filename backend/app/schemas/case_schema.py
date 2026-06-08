@@ -1,6 +1,20 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+
+
+class ClientCreate(BaseModel):
+    client_name: str
+    mobile_number: Optional[str] = None
+
+
+class ClientResponse(BaseModel):
+    id: int
+    client_name: str
+    mobile_number: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 
 # Create Case Schema
@@ -12,6 +26,7 @@ class CaseCreate(BaseModel):
     client_id: Optional[int] = None
     client_name: Optional[str] = None
     client_mobile: Optional[str] = None
+    clients: Optional[List[ClientCreate]] = None
 
 
 # Update Case Schema
@@ -24,6 +39,7 @@ class CaseUpdate(BaseModel):
     client_id: Optional[int] = None
     client_name: Optional[str] = None
     client_mobile: Optional[str] = None
+    clients: Optional[List[ClientCreate]] = None
 
 
 # Response Schema
@@ -38,6 +54,7 @@ class CaseResponse(BaseModel):
     client_id: Optional[int] = None
     client_name: Optional[str] = None
     client_mobile: Optional[str] = None
+    clients: List[ClientResponse] = []
     created_at: datetime
 
     class Config:

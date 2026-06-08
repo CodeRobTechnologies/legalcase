@@ -3,6 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import api from '../api/client';
 import './Cases.css';
 
+type Client = {
+  id?: number;
+  client_name: string;
+  mobile_number?: string | null;
+};
+
 type Case = {
   id: number;
   case_title: string;
@@ -12,6 +18,12 @@ type Case = {
   lawyer_id: number | null;
   client_name?: string | null;
   client_mobile?: string | null;
+  clients?: Client[];
+};
+
+type ClientForm = {
+  client_name: string;
+  mobile_number: string;
 };
 
 type CaseForm = {
@@ -20,11 +32,17 @@ type CaseForm = {
   case_description: string;
   lawyer_id: string;
   case_status: string;
-  client_name: string;
-  client_mobile: string;
+  clients: ClientForm[];
 };
 
-const EMPTY: CaseForm = { case_title: '', case_number: '', case_description: '', lawyer_id: '', case_status: '', client_name: '', client_mobile: '' };
+const EMPTY: CaseForm = {
+  case_title: '',
+  case_number: '',
+  case_description: '',
+  lawyer_id: '',
+  case_status: '',
+  clients: [{ client_name: '', mobile_number: '' }]
+};
 
 export default function Cases() {
   const [searchParams] = useSearchParams();
@@ -61,7 +79,10 @@ export default function Cases() {
   const filtered = cases.filter(c => {
     const matchSearch = c.case_title.toLowerCase().includes(search.toLowerCase()) ||
       c.case_description?.toLowerCase().includes(search.toLowerCase());
-    const matchClientSearch = clientSearch ? c.client_name?.toLowerCase().includes(clientSearch.toLowerCase()) : true;
+    const matchClientSearch = clientSearch ? (
+      c.clients?.some(cl => cl.client_name.toLowerCase().includes(clientSearch.toLowerCase())) ||
+      c.client_name?.toLowerCase().includes(clientSearch.toLowerCase())
+    ) : true;
     const matchStatus = statusFilter ? c.case_status === statusFilter : true;
     return matchSearch && matchClientSearch && matchStatus;
   });
@@ -77,8 +98,9 @@ export default function Cases() {
       case_description: c.case_description,
       lawyer_id: String(c.lawyer_id ?? ''),
       case_status: c.case_status,
-      client_name: c.client_name ?? '',
-      client_mobile: c.client_mobile ?? '',
+      clients: c.clients && c.clients.length > 0
+        ? c.clients.map(cl => ({ client_name: cl.client_name, mobile_number: cl.mobile_number ?? '' }))
+        : [{ client_name: c.client_name ?? '', mobile_number: c.client_mobile ?? '' }]
     });
     setFormError(''); setEditCase(c);
   };
@@ -93,8 +115,10 @@ export default function Cases() {
         case_number: form.case_number.trim() || null,
         lawyer_id: form.lawyer_id ? Number(form.lawyer_id) : null,
         case_status: form.case_status || 'Open',
-        client_name: form.client_name.trim() || null,
-        client_mobile: form.client_mobile.trim() || null,
+        clients: form.clients.filter(cl => cl.client_name.trim() !== '').map(cl => ({
+          client_name: cl.client_name.trim(),
+          mobile_number: cl.mobile_number.trim() || null
+        }))
       };
       if (editCase) {
         await api.put(`/cases/${editCase.id}`, payload);
@@ -111,6 +135,7 @@ export default function Cases() {
       setSaving(false);
     }
   };
+
 
   const handleDelete = async () => {
     if (!delCase) return;
@@ -177,8 +202,33 @@ export default function Cases() {
                   <td><strong style={{ color: 'var(--text)' }}>{c.case_title}</strong></td>
                   <td className="desc-cell">{c.case_description || '—'}</td>
                   <td><span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span></td>
-                  <td>{c.client_name || '—'}</td>
-                  <td>{c.client_mobile || '—'}</td>
+                  <td>
+                    {c.clients && c.clients.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {c.clients.map((cl, i) => (
+                          <span key={i} style={{ display: 'block' }}>
+                            {cl.client_name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      c.client_name || '—'
+                    )}
+                  </td>
+                  <td>
+                    {c.clients && c.clients.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {c.clients.map((cl, i) => (
+                          <span key={i} style={{ display: 'block', color: 'var(--text-muted)', fontSize: 13 }}>
+                            {cl.mobile_number || '—'}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      c.client_mobile || '—'
+                    )}
+                  </td>
+
                   <td>{c.lawyer_id ?? '—'}</td>
                   <td>
                     <div className="row-actions">
@@ -216,14 +266,68 @@ export default function Cases() {
                 <label className="form-label">Lawyer ID</label>
                 <input className="form-input" type="number" value={form.lawyer_id} onChange={e => setForm({ ...form, lawyer_id: e.target.value })} placeholder="Lawyer user ID" />
               </div>
-              <div className="form-group">
-                <label className="form-label">Client Name</label>
-                <input className="form-input" value={form.client_name} onChange={e => setForm({ ...form, client_name: e.target.value })} placeholder="Client name" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Client Mobile Number</label>
-                <input className="form-input" value={form.client_mobile} onChange={e => setForm({ ...form, client_mobile: e.target.value })} placeholder="Client mobile number" />
-              </div>
+              {form.clients.map((client, idx) => (
+                <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column', gap: 10, backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label className="form-label" style={{ fontWeight: 'bold', margin: 0 }}>Client {idx + 1}</label>
+                    {idx > 0 && (
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        style={{ padding: '2px 8px', fontSize: 12 }}
+                        onClick={() => {
+                          const updated = form.clients.filter((_, i) => i !== idx);
+                          setForm({ ...form, clients: updated });
+                        }}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Client Name *</label>
+                    <input
+                      className="form-input"
+                      value={client.client_name}
+                      onChange={e => {
+                        const updated = [...form.clients];
+                        updated[idx].client_name = e.target.value;
+                        setForm({ ...form, clients: updated });
+                      }}
+                      placeholder={`Client ${idx + 1} name`}
+                    />
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Client Mobile Number</label>
+                    <input
+                      className="form-input"
+                      value={client.mobile_number}
+                      onChange={e => {
+                        const updated = [...form.clients];
+                        updated[idx].mobile_number = e.target.value;
+                        setForm({ ...form, clients: updated });
+                      }}
+                      placeholder={`Client ${idx + 1} mobile number`}
+                    />
+                  </div>
+                </div>
+              ))}
+              {form.clients.length < 15 && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setForm({
+                      ...form,
+                      clients: [...form.clients, { client_name: '', mobile_number: '' }]
+                    });
+                  }}
+                  style={{ alignSelf: 'start', marginTop: 4 }}
+                >
+                  + Add Client as Client {form.clients.length + 1}
+                </button>
+              )}
+
               {editCase && (
                 <div className="form-group">
                   <label className="form-label">Status</label>

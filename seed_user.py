@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from app.database import Base, engine, SessionLocal
 from app.models.user_model import User
 from app.models.case_model import Case
@@ -11,11 +15,12 @@ from app.services.auth_service import hash_password
 Base.metadata.create_all(bind=engine)
 
 # Configuration
-email = "lawyer@example.com"
-password = "Password123!"
+email = os.getenv("SEED_USER_EMAIL", "lawyer@example.com")
+password = os.getenv("SEED_USER_PASSWORD", "Password123!")
 full_name = "Lawyer Example"
 role = "lawyer"
 phone_number = "123-456-7890"
+
 
 # Create a new session
 db = SessionLocal()
@@ -37,11 +42,13 @@ else:
     db.refresh(new_user)
     print(f"Created user with id {new_user.id}")
 # Additional seed for alternate credentials
-if not db.query(User).filter(User.email == "lawyer@exaample.com").first():
+alt_email = os.getenv("SEED_ALT_USER_EMAIL", "lawyer@exaample.com")
+alt_pass = os.getenv("SEED_ALT_USER_PASSWORD", "lawyer123")
+if not db.query(User).filter(User.email == alt_email).first():
     alt_user = User(
         full_name="Lawyer Example",
-        email="lawyer@exaample.com",
-        password=hash_password("lawyer123"),
+        email=alt_email,
+        password=hash_password(alt_pass),
         role="lawyer",
         phone_number="123-456-7890",
     )
@@ -51,3 +58,4 @@ if not db.query(User).filter(User.email == "lawyer@exaample.com").first():
     print(f"Created alternate user with id {alt_user.id}")
 
 db.close()
+

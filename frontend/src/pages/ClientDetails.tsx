@@ -3,12 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import './ClientDetails.css';
 
+type Client = {
+  id?: number;
+  client_name: string;
+  mobile_number?: string | null;
+};
+
 type CaseWithClient = {
   id: number;
   case_title: string;
   case_number?: string | null;
   client_name?: string | null;
   client_mobile?: string | null;
+  clients?: Client[];
 };
 
 export default function ClientDetails() {
@@ -23,7 +30,6 @@ export default function ClientDetails() {
     setLoading(true);
     try {
       const res = await api.get('/cases/');
-      // Filter out cases that don't have any client name defined
       setCases(res.data);
     } catch {
       setError('Failed to load client details.');
@@ -40,19 +46,38 @@ export default function ClientDetails() {
     navigate(`/cases?search=${encodeURIComponent(caseTitle)}`);
   };
 
-  // Filter list by client name, mobile, case title, or case number
-  const filteredClients = cases.filter(c => {
-    const query = search.toLowerCase();
-    const clientName = c.client_name || '';
-    const clientMobile = c.client_mobile || '';
-    const caseTitle = c.case_title || '';
-    const caseNumber = c.case_number || '';
+  // Flatten cases to client-case mappings
+  const clientCaseMappings = cases.reduce((acc, c) => {
+    if (c.clients && c.clients.length > 0) {
+      c.clients.forEach(cl => {
+        acc.push({
+          id: `${c.id}-${cl.id || Math.random()}`,
+          client_name: cl.client_name,
+          client_mobile: cl.mobile_number || '—',
+          case_number: c.case_number || '—',
+          case_title: c.case_title,
+        });
+      });
+    } else if (c.client_name) {
+      acc.push({
+        id: `${c.id}-legacy`,
+        client_name: c.client_name,
+        client_mobile: c.client_mobile || '—',
+        case_number: c.case_number || '—',
+        case_title: c.case_title,
+      });
+    }
+    return acc;
+  }, [] as { id: string; client_name: string; client_mobile: string; case_number: string; case_title: string }[]);
 
+  // Filter list by client name, mobile, case title, or case number
+  const filteredClients = clientCaseMappings.filter(item => {
+    const query = search.toLowerCase();
     return (
-      clientName.toLowerCase().includes(query) ||
-      clientMobile.toLowerCase().includes(query) ||
-      caseTitle.toLowerCase().includes(query) ||
-      caseNumber.toLowerCase().includes(query)
+      item.client_name.toLowerCase().includes(query) ||
+      item.client_mobile.toLowerCase().includes(query) ||
+      item.case_title.toLowerCase().includes(query) ||
+      item.case_number.toLowerCase().includes(query)
     );
   });
 

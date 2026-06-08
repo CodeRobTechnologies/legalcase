@@ -25,7 +25,8 @@ from app.services.reminder_service import (
 )
 
 from app.services.auth_service import (
-    verify_token
+    verify_token,
+    verify_admin
 )
 
 
@@ -216,12 +217,13 @@ def get_notifications(
     user_data: dict = Depends(verify_token)
 
 ):
+    role = user_data.get("role")
+    user_id = user_data.get("user_id")
 
-    notifications = db.query(
-        Notification
-    ).order_by(
-        Notification.id.desc()
-    ).all()
+    if role == "admin":
+        notifications = db.query(Notification).order_by(Notification.id.desc()).all()
+    else:
+        notifications = db.query(Notification).filter(Notification.user_id == user_id).order_by(Notification.id.desc()).all()
 
     return notifications
 
@@ -259,6 +261,13 @@ def get_notification(
             detail="Notification not found"
         )
 
+    role = user_data.get("role")
+    user_id = user_data.get("user_id")
+    if role != "admin" and notification.user_id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
 
     return notification
 
@@ -273,7 +282,9 @@ def mark_notification_read(
 
     notification_id: int,
 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+
+    user_data: dict = Depends(verify_token)
 
 ):
 
@@ -295,6 +306,13 @@ def mark_notification_read(
             detail="Notification not found"
         )
 
+    role = user_data.get("role")
+    user_id = user_data.get("user_id")
+    if role != "admin" and notification.user_id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
 
     notification.is_read = True
 
@@ -343,6 +361,13 @@ def delete_notification(
             detail="Notification not found"
         )
 
+    role = user_data.get("role")
+    user_id = user_data.get("user_id")
+    if role != "admin" and notification.user_id != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
 
     db.delete(notification)
 
@@ -366,13 +391,17 @@ async def create_notification(
 
     notification: NotificationCreate,
 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+
+    user_data: dict = Depends(verify_token)
 
 ):
 
+    user_id = user_data.get("user_id")
+
     new_notification = Notification(
 
-        user_id=notification.user_id,
+        user_id=user_id,
 
         title=notification.title,
 
@@ -407,11 +436,14 @@ async def create_notification(
 @router.post("/send-hearing-reminders")
 def send_hearing_reminders(
 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+
+    admin_user: dict = Depends(verify_admin)
 
 ):
 
     return create_hearing_reminders(db)
+
 
 
 
