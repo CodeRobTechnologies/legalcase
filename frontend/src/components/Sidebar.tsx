@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { clearSession } from '../lib/auth';
 import './Sidebar.css';
 
 const NAV = [
@@ -16,10 +17,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    sessionStorage.removeItem('access_token');
-    sessionStorage.removeItem('user_id');
-    sessionStorage.removeItem('user_email');
-    navigate('/login');
+    clearSession();
+    navigate('/login', { replace: true });
   };
 
   return (

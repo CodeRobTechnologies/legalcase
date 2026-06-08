@@ -13,14 +13,11 @@ import ClientDetails from './pages/ClientDetails';
 import AccountInfo from './pages/AccountInfo';
 import Header from './components/Header';
 import api from './api/client';
+import { isAuthenticated } from './lib/auth';
 
 // Immediately set the theme from localStorage to prevent flash
 const initialTheme = localStorage.getItem('theme') || 'dark';
 document.documentElement.setAttribute('data-theme', initialTheme);
-
-function isAuthenticated() {
-  return !!sessionStorage.getItem('access_token');
-}
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(isAuthenticated() && !sessionStorage.getItem('user_id'));

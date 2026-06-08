@@ -34,11 +34,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Local databases
-*.db
-*.sqlite
-*.sqlite3
-
 # Uploads and runtime artifacts
 uploads/
 backend/uploads/

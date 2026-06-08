@@ -1,8 +1,9 @@
 import api from '../lib/api';
+import { getToken, clearSession } from './../lib/auth';
 
-// Attach JWT from localStorage on every request
+// Attach JWT from sessionStorage on every request
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('access_token');
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -21,7 +22,7 @@ api.interceptors.response.use(
     });
 
     if (err.response?.status === 401) {
-      sessionStorage.removeItem('access_token');
+      clearSession();
       if (!window.location.pathname.startsWith('/login')) {
         window.location.href = '/login';
       }

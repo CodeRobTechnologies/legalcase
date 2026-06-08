@@ -1,0 +1,8 @@
+{
+  "name": "legalcase",
+  "private": true,
+  "scripts": {
+    "dev": "bash scripts/run.sh",
+    "dev:windows": "powershell -ExecutionPolicy Bypass -File scripts/run.ps1"
+  }
+}
