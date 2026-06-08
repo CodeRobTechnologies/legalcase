@@ -194,6 +194,8 @@ app = FastAPI(
 # =========================
 
 origins = [o.strip() for o in os.getenv("FRONTEND_URL", "http://localhost:5173").split(",") if o.strip()]
+if "https://legalcase-eight.vercel.app" not in origins:
+    origins.append("https://legalcase-eight.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
@@ -202,6 +204,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.middleware("http")
 async def debug_cors_middleware(request: Request, call_next):
