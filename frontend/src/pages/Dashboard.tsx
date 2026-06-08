@@ -21,15 +21,28 @@ type TodoTask = {
   starred: boolean;
 };
 
+type ClientForm = {
+  client_name: string;
+  mobile_number: string;
+};
+
 type CaseForm = {
   case_title: string;
   case_number: string;
   case_description: string;
   lawyer_id: string;
   case_status: string;
+  clients: ClientForm[];
 };
 
-const EMPTY: CaseForm = { case_title: '', case_number: '', case_description: '', lawyer_id: '', case_status: '' };
+const EMPTY: CaseForm = {
+  case_title: '',
+  case_number: '',
+  case_description: '',
+  lawyer_id: '',
+  case_status: '',
+  clients: [{ client_name: '', mobile_number: '' }]
+};
 
 type HearingForm = {
   case_id: string;
@@ -156,7 +169,11 @@ export default function Dashboard() {
         case_description: form.case_description,
         case_number: form.case_number.trim() || null,
         lawyer_id: form.lawyer_id ? Number(form.lawyer_id) : null,
-        case_status: form.case_status || 'Open'
+        case_status: form.case_status || 'Open',
+        clients: form.clients.filter(cl => cl.client_name.trim() !== '').map(cl => ({
+          client_name: cl.client_name.trim(),
+          mobile_number: cl.mobile_number.trim() || null
+        }))
       };
       await api.post('/cases/', payload);
       setShowAdd(false);
@@ -354,6 +371,70 @@ export default function Dashboard() {
                   id="dashboard-new-case-lawyer"
                 />
               </div>
+              {form.clients.map((client, idx) => (
+                <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column', gap: 10, backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label className="form-label" style={{ fontWeight: 'bold', margin: 0 }}>Client {idx + 1}</label>
+                    {idx > 0 && (
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        style={{ padding: '2px 8px', fontSize: 12 }}
+                        onClick={() => {
+                          const updated = form.clients.filter((_, i) => i !== idx);
+                          setForm({ ...form, clients: updated });
+                        }}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Client Name *</label>
+                    <input
+                      className="form-input"
+                      value={client.client_name}
+                      onChange={e => {
+                        const updated = [...form.clients];
+                        updated[idx].client_name = e.target.value;
+                        setForm({ ...form, clients: updated });
+                      }}
+                      placeholder={`Client ${idx + 1} name`}
+                      id={`dashboard-new-case-client-name-${idx}`}
+                    />
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Client Mobile Number</label>
+                    <input
+                      className="form-input"
+                      value={client.mobile_number}
+                      onChange={e => {
+                        const updated = [...form.clients];
+                        updated[idx].mobile_number = e.target.value;
+                        setForm({ ...form, clients: updated });
+                      }}
+                      placeholder={`Client ${idx + 1} mobile number`}
+                      id={`dashboard-new-case-client-mobile-${idx}`}
+                    />
+                  </div>
+                </div>
+              ))}
+              {form.clients.length < 15 && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setForm({
+                      ...form,
+                      clients: [...form.clients, { client_name: '', mobile_number: '' }]
+                    });
+                  }}
+                  style={{ alignSelf: 'start', marginTop: 4 }}
+                  id="dashboard-new-case-add-client-btn"
+                >
+                  + Add Client as Client {form.clients.length + 1}
+                </button>
+              )}
             </div>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setShowAdd(false)}>Cancel</button>
