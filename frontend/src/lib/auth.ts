@@ -10,10 +10,11 @@ function decodeToken(token: string): JwtPayload | null {
   try {
     const payload = token.split('.')[1];
     if (!payload) return null;
-    // base64url -> base64
+    // base64url -> base64 with padding
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
     const json = decodeURIComponent(
-      atob(base64)
+      atob(padded)
         .split('')
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
