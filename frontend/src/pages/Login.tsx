@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
+import { isApiConfigured } from '../lib/api';
 import './Login.css';
 
 export default function Login() {
@@ -28,8 +29,14 @@ export default function Login() {
         setError('Token not found in response.');
       }
     } catch (err) {
-      const error = err as { response?: { data?: { detail?: string } } };
-      setError(error.response?.data?.detail || 'Login failed. Please check your credentials.');
+      const error = err as { response?: { status?: number; data?: { detail?: string } } };
+      if (error.response?.status === 405 || !isApiConfigured()) {
+        setError(
+          'Cannot reach the API server. Set VITE_API_URL to your Railway backend URL in Vercel, then redeploy.'
+        );
+      } else {
+        setError(error.response?.data?.detail || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -45,6 +52,12 @@ export default function Login() {
           <h1 className="login-title">LegalCase</h1>
           <p className="login-sub">Sign in to your account</p>
         </div>
+
+        {!isApiConfigured() && (
+          <div className="alert alert-error">
+            API URL is not configured. Set <code>VITE_API_URL</code> in Vercel to your Railway backend URL and redeploy.
+          </div>
+        )}
 
         {error && <div className="alert alert-error">{error}</div>}
 

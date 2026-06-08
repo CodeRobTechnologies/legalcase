@@ -13,9 +13,17 @@ Set the following in Vercel project settings:
 
 | Variable | Example | Required |
 |----------|---------|----------|
-| `VITE_API_URL` | `https://api.yourdomain.com` | Yes |
+| `VITE_API_URL` | `https://your-app.up.railway.app` | Yes |
 
 Rebuild after changing `VITE_API_URL` — it is baked in at build time.
+
+### Troubleshooting: login returns 405
+
+If the browser console shows `405` on `POST /auth/login-json` with an empty response body, the frontend is calling **Vercel** instead of your **Railway** API. That happens when `VITE_API_URL` was not set at build time.
+
+1. Vercel → Project → Settings → Environment Variables
+2. Add `VITE_API_URL` = your Railway public URL (no trailing slash)
+3. Redeploy the frontend (Deployments → … → Redeploy)
 
 ## Backend
 
