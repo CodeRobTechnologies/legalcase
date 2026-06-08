@@ -221,61 +221,106 @@ export default function Cases() {
       ) : filtered.length === 0 ? (
         <div className="empty-state"><span className="empty-icon">⚖</span>No cases found</div>
       ) : (
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th><th>Case Number</th><th>Title</th><th>Description</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(c => (
-                <tr key={c.id}>
-                  <td>#{c.id}</td>
-                  <td>{c.case_number || '—'}</td>
-                  <td><strong style={{ color: 'var(--text)' }}>{c.case_title}</strong></td>
-                  <td className="desc-cell">{c.case_description || '—'}</td>
-                  <td><span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span></td>
-                  <td>
-                    {c.clients && c.clients.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {c.clients.map((cl, i) => (
-                          <span key={i} style={{ display: 'block' }}>
-                            {cl.client_name}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      c.client_name || '—'
-                    )}
-                  </td>
-                  <td>
-                    {c.clients && c.clients.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {c.clients.map((cl, i) => (
-                          <span key={i} style={{ display: 'block', color: 'var(--text-muted)', fontSize: 13 }}>
-                            {cl.mobile_number || '—'}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      c.client_mobile || '—'
-                    )}
-                  </td>
-
-                  <td>{c.lawyer_id ?? '—'}</td>
-                  <td>
-                    <div className="row-actions">
-                      <button className="btn btn-secondary btn-sm" onClick={() => openView(c)}>View</button>
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(c)}>Edit</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => setDelCase(c)}>Delete</button>
-                    </div>
-                  </td>
+        <>
+          <div className="table-wrapper desktop-table-view">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>Case Number</th><th>Title</th><th>Description</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filtered.map(c => (
+                  <tr key={c.id}>
+                    <td>#{c.id}</td>
+                    <td>{c.case_number || '—'}</td>
+                    <td><strong style={{ color: 'var(--text)' }}>{c.case_title}</strong></td>
+                    <td className="desc-cell">{c.case_description || '—'}</td>
+                    <td><span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span></td>
+                    <td>
+                      {c.clients && c.clients.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {c.clients.map((cl, i) => (
+                            <span key={i} style={{ display: 'block' }}>
+                              {cl.client_name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        c.client_name || '—'
+                      )}
+                    </td>
+                    <td>
+                      {c.clients && c.clients.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {c.clients.map((cl, i) => (
+                            <span key={i} style={{ display: 'block', color: 'var(--text-muted)', fontSize: 13 }}>
+                              {cl.mobile_number || '—'}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        c.client_mobile || '—'
+                      )}
+                    </td>
+
+                    <td>{c.lawyer_id ?? '—'}</td>
+                    <td>
+                      <div className="row-actions">
+                        <button className="btn btn-secondary btn-sm" onClick={() => openView(c)}>View</button>
+                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(c)}>Edit</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => setDelCase(c)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mobile-cards-view">
+            {filtered.map(c => (
+              <div key={c.id} className="card mobile-case-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>#{c.id}</span>
+                  <span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span>
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', margin: 0 }}>{c.case_title}</h3>
+                  {c.case_number && (
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Case Number: {c.case_number}</p>
+                  )}
+                </div>
+                {c.case_description && (
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineClamp: 2, WebkitLineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {c.case_description}
+                  </p>
+                )}
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 13 }}>
+                    <div>
+                      <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Clients</span>
+                      <strong style={{ fontWeight: 500 }}>
+                        {c.clients && c.clients.length > 0
+                          ? c.clients.map(cl => cl.client_name).join(', ')
+                          : c.client_name || '—'}
+                      </strong>
+                    </div>
+                    <div>
+                      <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Lawyer ID</span>
+                      <strong style={{ fontWeight: 500 }}>{c.lawyer_id ?? '—'}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <button type="button" className="btn btn-secondary btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => openView(c)}>View</button>
+                  <button type="button" className="btn btn-secondary btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => openEdit(c)}>Edit</button>
+                  <button type="button" className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setDelCase(c)}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Add / Edit Modal */}

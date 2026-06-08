@@ -19,3 +19,27 @@
 }
 
 .row-actions { display: flex; gap: 6px; }
+
+.desktop-table-view {
+  display: block;
+}
+
+.mobile-cards-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-table-view {
+    display: none;
+  }
+  .mobile-cards-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .filters .form-input,
+  .filters .search-input {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+}
