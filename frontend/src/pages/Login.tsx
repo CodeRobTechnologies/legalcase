@@ -29,17 +29,11 @@ export default function Login() {
       }
     } catch (err) {
       const error = err as any;
-      const detail = error.response?.data?.detail;
-      if (typeof detail === 'string') {
-        setError(detail);
-      } else if (Array.isArray(detail)) {
-        const msg = detail.map((d: any) => `${d.loc ? d.loc.join('.') : 'field'}: ${d.msg}`).join(', ');
-        setError(msg || 'Validation error');
-      } else if (detail && typeof detail === 'object') {
-        setError(JSON.stringify(detail));
-      } else {
-        setError(error.response?.data?.message || error.message || 'Login failed. Please check your credentials.');
-      }
+      const msg = error.response?.data?.detail;
+      const errorMessage = Array.isArray(msg)
+        ? msg.map((e: any) => e.msg).join(", ")
+        : msg || "Login failed";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
