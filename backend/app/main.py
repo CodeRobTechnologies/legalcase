@@ -196,10 +196,13 @@ app = FastAPI(
 origins = [o.strip() for o in os.getenv("FRONTEND_URL", "http://localhost:5173").split(",") if o.strip()]
 if "https://legalcase-eight.vercel.app" not in origins:
     origins.append("https://legalcase-eight.vercel.app")
+if "https://frontend-legal-inky.vercel.app" not in origins:
+    origins.append("https://frontend-legal-inky.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
