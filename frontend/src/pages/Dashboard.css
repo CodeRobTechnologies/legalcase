@@ -229,16 +229,18 @@
   color: #64748b;
   font-size: 18px;
   cursor: pointer;
-  opacity: 0;
-  padding: 0 4px;
+  opacity: 0.6;
+  padding: 4px 8px;
   line-height: 1;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.todo-item:hover .todo-delete-btn {
-  opacity: 1;
-}
-
+.todo-item:hover .todo-delete-btn,
+.todo-delete-btn:focus-visible,
 .todo-delete-btn:hover {
+  opacity: 1;
   color: #ef4444;
 }
