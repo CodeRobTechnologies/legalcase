@@ -29,6 +29,7 @@ console.log('[LegalCase Frontend App Startup]', {
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(isAuthenticated() && !localStorage.getItem('user_id'));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated() && !localStorage.getItem('user_id')) {
@@ -49,9 +50,10 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
       <div className="main-content">
-        <Header />
+        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <div className="page-body">{children}</div>
       </div>
     </div>

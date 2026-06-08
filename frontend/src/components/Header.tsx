@@ -13,7 +13,7 @@ type Hearing = {
   status: string;
 };
 
-export default function Header() {
+export default function Header({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
@@ -85,7 +85,14 @@ export default function Header() {
   return (
     <header className="top-header">
       <div className="header-left">
-        {/* Optional: Add search or page context indicator */}
+        <button
+          type="button"
+          className="sidebar-toggle-btn"
+          onClick={onToggleSidebar}
+          title="Toggle Navigation"
+        >
+          ☰
+        </button>
       </div>
       
       <div className="header-right" ref={dropdownRef}>

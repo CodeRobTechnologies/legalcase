@@ -13,7 +13,7 @@ const NAV = [
   { to: '/account',   icon: '👤', label: 'Account Info' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -22,7 +22,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-brand">
         <span className="brand-icon">⚖</span>
         <div>
@@ -37,6 +37,7 @@ export default function Sidebar() {
             key={to}
             to={to}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            onClick={onClose}
           >
             <span className="nav-icon">{icon}</span>
             <span className="nav-label">{label}</span>
@@ -44,7 +45,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <button className="sidebar-logout" onClick={handleLogout}>
+      <button className="sidebar-logout" onClick={() => { handleLogout(); onClose(); }}>
         <span>⎋</span> Logout
       </button>
     </aside>
