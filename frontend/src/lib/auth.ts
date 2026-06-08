@@ -25,7 +25,7 @@ function decodeToken(token: string): JwtPayload | null {
 }
 
 export function getToken(): string | null {
-  return sessionStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 // Returns true only if a token exists AND has not expired.
@@ -48,7 +48,7 @@ export function isAuthenticated(): boolean {
 
 // Single source of truth for tearing down the client session.
 export function clearSession(): void {
-  sessionStorage.removeItem(TOKEN_KEY);
-  sessionStorage.removeItem('user_id');
-  sessionStorage.removeItem('user_email');
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('user_id');
+  localStorage.removeItem('user_email');
 }

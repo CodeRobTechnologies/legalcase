@@ -18,7 +18,7 @@ type CaseOption = {
 };
 
 export default function PreparationList() {
-  const userId = sessionStorage.getItem('user_id') || 'default';
+  const userId = localStorage.getItem('user_id') || 'default';
   const listKey = `preparation_list_${userId}`;
 
   const [prepList, setPrepList] = useState<PrepItem[]>(() => {

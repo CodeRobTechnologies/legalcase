@@ -19,15 +19,23 @@ import { isAuthenticated } from './lib/auth';
 const initialTheme = localStorage.getItem('theme') || 'dark';
 document.documentElement.setAttribute('data-theme', initialTheme);
 
+// Console log environment variables at app start to diagnose production configuration
+console.log('[LegalCase Frontend App Startup]', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  MODE: import.meta.env.MODE,
+  DEV: import.meta.env.DEV,
+  PROD: import.meta.env.PROD,
+});
+
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(isAuthenticated() && !sessionStorage.getItem('user_id'));
+  const [loading, setLoading] = useState(isAuthenticated() && !localStorage.getItem('user_id'));
 
   useEffect(() => {
-    if (isAuthenticated() && !sessionStorage.getItem('user_id')) {
+    if (isAuthenticated() && !localStorage.getItem('user_id')) {
       api.get('/auth/me')
         .then(res => {
-          sessionStorage.setItem('user_id', String(res.data.id));
-          sessionStorage.setItem('user_email', res.data.email);
+          localStorage.setItem('user_id', String(res.data.id));
+          localStorage.setItem('user_email', res.data.email);
           setLoading(false);
         })
         .catch(() => {
