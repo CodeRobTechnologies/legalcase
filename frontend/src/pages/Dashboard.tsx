@@ -536,39 +536,73 @@ export default function Dashboard() {
 
 function StatCard({ label, value, icon, color, onClick, id }: { label: string; value: number | string; icon: string; color: string; onClick?: () => void; id?: string }) {
   const isClickable = !!onClick;
-  return (
-    <div
-      className="stat-card card"
-      onClick={onClick}
-      id={id}
-      style={{
-        alignItems: 'center',
-        textAlign: 'center',
-        width: '5cm',
-        height: '5cm',
-        cursor: isClickable ? 'pointer' : 'default',
-        transition: 'all 0.2s ease',
-      }}
-      onMouseEnter={(e) => {
-        if (isClickable) {
+  
+  const content = (
+    <>
+      <div className="stat-icon" style={{ background: `${color}22`, color }}>{icon}</div>
+      <div className="stat-value">{value}</div>
+      <div className="stat-label">{label}</div>
+    </>
+  );
+
+  const commonStyle = {
+    alignItems: 'center',
+    textAlign: 'center' as const,
+    width: '5cm',
+    height: '5cm',
+    transition: 'all 0.2s ease',
+  };
+
+  if (isClickable) {
+    return (
+      <button
+        type="button"
+        className="stat-card card"
+        onClick={onClick}
+        id={id}
+        style={{
+          ...commonStyle,
+          cursor: 'pointer',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          fontFamily: 'inherit',
+          fontSize: 'inherit',
+          color: 'inherit',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: '12px',
+          padding: '16px',
+          borderRadius: 'var(--radius-lg)',
+        }}
+        onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-3px)';
           e.currentTarget.style.borderColor = color;
           e.currentTarget.style.boxShadow = `0 6px 20px ${color}1a`;
           e.currentTarget.style.background = `${color}0b`;
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (isClickable) {
+        }}
+        onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateY(0)';
           e.currentTarget.style.borderColor = 'var(--border)';
           e.currentTarget.style.boxShadow = 'none';
           e.currentTarget.style.background = 'var(--bg-card)';
-        }
+        }}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className="stat-card card"
+      id={id}
+      style={{
+        ...commonStyle,
+        cursor: 'default',
       }}
     >
-      <div className="stat-icon" style={{ background: `${color}22`, color }}>{icon}</div>
-      <div className="stat-value">{value}</div>
-      <div className="stat-label">{label}</div>
+      {content}
     </div>
   );
 }
