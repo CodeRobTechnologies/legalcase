@@ -22,9 +22,8 @@ api.interceptors.response.use(
 
     if (err.response?.status === 401) {
       sessionStorage.removeItem('access_token');
-      const isLoginPage = window.location.hash.startsWith('#/login') || window.location.pathname.startsWith('/login');
-      if (!isLoginPage) {
-        window.location.href = '/#/login';
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
       }
       // reject with error after handling
       return Promise.reject(err);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Login    from './pages/Login';
@@ -55,7 +55,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
@@ -69,6 +69,6 @@ export default function App() {
         <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
