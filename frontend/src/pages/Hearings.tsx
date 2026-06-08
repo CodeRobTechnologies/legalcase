@@ -177,31 +177,68 @@ export default function Hearings() {
         hearings.length === 0 ? (
           <div className="empty-state"><span className="empty-icon">📅</span>No hearings scheduled</div>
         ) : (
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr><th>ID</th><th>Case Number</th><th>Case Title</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                {hearings.map(h => (
-                  <tr key={h.id}>
-                    <td>#{h.id}</td>
-                    <td>{h.case_number || '—'}</td>
-                    <td><strong style={{color:'var(--text)'}}>{h.case_title || h.title}</strong></td>
-                    <td style={{fontSize:13}}>{h.hearing_date ? new Date(h.hearing_date).toLocaleString() : '—'}</td>
-                    <td style={{fontSize:13,color:'var(--text-muted)'}}>{h.location}</td>
-                    <td><span className={`badge ${statusClass(h.status)}`}>{h.status}</span></td>
-                    <td>
-                      <div style={{display:'flex',gap:6}}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(h)}>Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => setDelH(h)}>Delete</button>
+          <>
+            <div className="table-wrapper desktop-table-view">
+              <table>
+                <thead>
+                  <tr><th>ID</th><th>Case Number</th><th>Case Title</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {hearings.map(h => (
+                    <tr key={h.id}>
+                      <td>#{h.id}</td>
+                      <td>{h.case_number || '—'}</td>
+                      <td><strong style={{color:'var(--text)'}}>{h.case_title || h.title}</strong></td>
+                      <td style={{fontSize:13}}>{h.hearing_date ? new Date(h.hearing_date).toLocaleString() : '—'}</td>
+                      <td style={{fontSize:13,color:'var(--text-muted)'}}>{h.location}</td>
+                      <td><span className={`badge ${statusClass(h.status)}`}>{h.status}</span></td>
+                      <td>
+                        <div style={{display:'flex',gap:6}}>
+                          <button className="btn btn-secondary btn-sm" onClick={() => openEdit(h)}>Edit</button>
+                          <button className="btn btn-danger btn-sm" onClick={() => setDelH(h)}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mobile-cards-view">
+              {hearings.map(h => (
+                <div key={h.id} className="card mobile-hearing-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>#{h.id}</span>
+                    <span className={`badge ${statusClass(h.status)}`}>{h.status}</span>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', margin: 0 }}>{h.case_title || h.title}</h3>
+                    {h.case_number && (
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Case Number: {h.case_number}</p>
+                    )}
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8, fontSize: 13 }}>
+                      <div>
+                        <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Date & Time</span>
+                        <strong style={{ fontWeight: 500 }}>
+                          {h.hearing_date ? new Date(h.hearing_date).toLocaleString() : '—'}
+                        </strong>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <div>
+                        <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Location</span>
+                        <strong style={{ fontWeight: 500, color: 'var(--text-muted)' }}>{h.location}</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                    <button type="button" className="btn btn-secondary btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => openEdit(h)}>Edit</button>
+                    <button type="button" className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setDelH(h)}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )
       ) : (
         <div className="calendar-container">
@@ -259,6 +296,11 @@ export default function Hearings() {
                       >
                         {h.case_title || h.title}
                       </div>
+                    ))}
+                  </div>
+                  <div className="calendar-day-dots">
+                    {dayHearings.map(h => (
+                      <span key={h.id} className={`calendar-event-dot ${h.status}`} title={`${h.case_title || h.title} - ${h.location}`} />
                     ))}
                   </div>
                 </div>

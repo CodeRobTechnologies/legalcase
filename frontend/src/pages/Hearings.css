@@ -188,3 +188,75 @@
   color: var(--danger);
   border-left-color: var(--danger);
 }
+
+.desktop-table-view {
+  display: block;
+}
+
+.mobile-cards-view {
+  display: none;
+}
+
+.calendar-day-dots {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-table-view {
+    display: none;
+  }
+  .mobile-cards-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .calendar-container {
+    padding: 12px;
+  }
+  .calendar-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .calendar-weekday {
+    font-size: 9px;
+    padding: 4px 0;
+  }
+  .calendar-day-cell {
+    min-height: 55px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .calendar-day-number {
+    font-size: 11px;
+  }
+  .calendar-day-add-btn {
+    display: none;
+  }
+  .calendar-day-events {
+    display: none;
+  }
+  .calendar-day-dots {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+  .calendar-event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .calendar-event-dot.Scheduled {
+    background-color: var(--primary);
+  }
+  .calendar-event-dot.Completed {
+    background-color: var(--success);
+  }
+  .calendar-event-dot.Cancelled {
+    background-color: var(--danger);
+  }
+}
