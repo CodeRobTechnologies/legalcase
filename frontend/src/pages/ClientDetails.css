@@ -1,4 +1,30 @@
 .client-details-page {
-  max-width: 1100px;
+  max-width: 1000px;
+}
+
+.desktop-table-view {
+  display: block;
+}
+
+.mobile-cards-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-table-view {
+    display: none;
+  }
+  .mobile-cards-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .filters .form-input,
+  .filters .search-input {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+}
+.client-details-page {
   margin: 0 auto;
 }

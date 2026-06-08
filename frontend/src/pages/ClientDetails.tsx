@@ -110,37 +110,72 @@ export default function ClientDetails() {
           <p>{search ? 'No matching clients found.' : 'No client details available.'}</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Client Name</th>
-                <th>Phone Number</th>
-                <th>Case Number</th>
-                <th>Case Title</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredClients.map(c => (
-                <tr key={c.id}>
-                  <td><strong style={{ color: 'var(--text)' }}>{c.client_name || '—'}</strong></td>
-                  <td style={{ fontSize: 13, fontFamily: 'monospace' }}>{c.client_mobile || '—'}</td>
-                  <td style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 600 }}>{c.case_number || '—'}</td>
-                  <td>{c.case_title}</td>
-                  <td>
-                    <button 
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => handleGoToCase(c.case_title)}
-                    >
-                      👁 Go to Case
-                    </button>
-                  </td>
+        <>
+          <div className="table-wrapper desktop-table-view">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Phone Number</th>
+                  <th>Case Number</th>
+                  <th>Case Title</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredClients.map(c => (
+                  <tr key={c.id}>
+                    <td><strong style={{ color: 'var(--text)' }}>{c.client_name || '—'}</strong></td>
+                    <td style={{ fontSize: 13, fontFamily: 'monospace' }}>{c.client_mobile || '—'}</td>
+                    <td style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 600 }}>{c.case_number || '—'}</td>
+                    <td>{c.case_title}</td>
+                    <td>
+                      <button 
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => handleGoToCase(c.case_title)}
+                      >
+                        👁 Go to Case
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mobile-cards-view">
+            {filteredClients.map(c => (
+              <div key={c.id} className="card mobile-client-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', margin: 0 }}>{c.client_name || '—'}</h3>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 4 }}>📞 {c.client_mobile || '—'}</p>
+                </div>
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 6, fontSize: 13 }}>
+                    <div>
+                      <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Case Title</span>
+                      <strong style={{ fontWeight: 500 }}>{c.case_title}</strong>
+                    </div>
+                    <div>
+                      <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Case Number</span>
+                      <strong style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.case_number || '—'}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <button 
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    style={{ width: '100%', justifyContent: 'center' }}
+                    onClick={() => handleGoToCase(c.case_title)}
+                  >
+                    👁 Go to Case
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
