@@ -18,10 +18,10 @@ export default function Login() {
       const res = await api.post('/auth/login-json', { email, password });
       const token = res.data.access_token || res.data.token;
       if (token) {
-        localStorage.setItem('access_token', token);
+        sessionStorage.setItem('access_token', token);
         if (res.data.user) {
-          localStorage.setItem('user_id', String(res.data.user.id));
-          localStorage.setItem('user_email', res.data.user.email);
+          sessionStorage.setItem('user_id', String(res.data.user.id));
+          sessionStorage.setItem('user_email', res.data.user.email);
         }
         navigate('/dashboard');
       } else {

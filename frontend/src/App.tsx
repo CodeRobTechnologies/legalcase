@@ -19,18 +19,18 @@ const initialTheme = localStorage.getItem('theme') || 'dark';
 document.documentElement.setAttribute('data-theme', initialTheme);
 
 function isAuthenticated() {
-  return !!localStorage.getItem('access_token');
+  return !!sessionStorage.getItem('access_token');
 }
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(isAuthenticated() && !localStorage.getItem('user_id'));
+  const [loading, setLoading] = useState(isAuthenticated() && !sessionStorage.getItem('user_id'));
 
   useEffect(() => {
-    if (isAuthenticated() && !localStorage.getItem('user_id')) {
+    if (isAuthenticated() && !sessionStorage.getItem('user_id')) {
       api.get('/auth/me')
         .then(res => {
-          localStorage.setItem('user_id', String(res.data.id));
-          localStorage.setItem('user_email', res.data.email);
+          sessionStorage.setItem('user_id', String(res.data.id));
+          sessionStorage.setItem('user_email', res.data.email);
           setLoading(false);
         })
         .catch(() => {

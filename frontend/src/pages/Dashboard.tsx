@@ -58,7 +58,7 @@ export default function Dashboard() {
   const [caseSearch, setCaseSearch] = useState('');
 
   // Today's To Do State
-  const userId = localStorage.getItem('user_id') || 'default';
+  const userId = sessionStorage.getItem('user_id') || 'default';
   const todoKey = `todo_tasks_${userId}`;
 
   const [todoTasks, setTodoTasks] = useState<TodoTask[]>(() => {
