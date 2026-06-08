@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import './Dashboard.css';
 
@@ -54,6 +55,7 @@ type HearingForm = {
 const EMPTY_HEARING: HearingForm = { case_id: '', hearing_date: '', location: '', status: 'Scheduled' };
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [recentCases, setRecentCases] = useState<RecentCase[]>([]);
   const [cases, setCases] = useState<{ id: number; case_title: string; case_number?: string | null }[]>([]);
@@ -205,8 +207,8 @@ export default function Dashboard() {
       <div className="stats-grid">
         <ActionCard label="Add New Case"    value="+ Case"                    icon="⚖"  color="#4f46e5" onClick={openAdd} id="add-case-btn" />
         <ActionCard label="Schedule Hearing" value="+ Hearing"                 icon="📅" color="#06b6d4" onClick={openSchedule} id="schedule-hearing-btn" />
-        <StatCard label="Total Cases"      value={analytics!.total_cases}      icon="⚖"  color="#4f46e5" />
-        <StatCard label="Upcoming Hearings" value={analytics!.upcoming_hearings} icon="📅" color="#06b6d4" />
+        <StatCard label="Total Cases"      value={analytics!.total_cases}      icon="⚖"  color="#4f46e5" onClick={() => navigate('/cases')} id="total-cases-card" />
+        <StatCard label="Upcoming Hearings" value={analytics!.upcoming_hearings} icon="📅" color="#06b6d4" onClick={() => navigate('/hearings')} id="upcoming-hearings-card" />
       </div>
 
       <div className="dash-bottom">
@@ -532,9 +534,38 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ label, value, icon, color }: { label: string; value: number | string; icon: string; color: string }) {
+function StatCard({ label, value, icon, color, onClick, id }: { label: string; value: number | string; icon: string; color: string; onClick?: () => void; id?: string }) {
+  const isClickable = !!onClick;
   return (
-    <div className="stat-card card" style={{ alignItems: 'center', textAlign: 'center', width: '5cm', height: '5cm' }}>
+    <div
+      className="stat-card card"
+      onClick={onClick}
+      id={id}
+      style={{
+        alignItems: 'center',
+        textAlign: 'center',
+        width: '5cm',
+        height: '5cm',
+        cursor: isClickable ? 'pointer' : 'default',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={(e) => {
+        if (isClickable) {
+          e.currentTarget.style.transform = 'translateY(-3px)';
+          e.currentTarget.style.borderColor = color;
+          e.currentTarget.style.boxShadow = `0 6px 20px ${color}1a`;
+          e.currentTarget.style.background = `${color}0b`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (isClickable) {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.borderColor = 'var(--border)';
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.background = 'var(--bg-card)';
+        }
+      }}
+    >
       <div className="stat-icon" style={{ background: `${color}22`, color }}>{icon}</div>
       <div className="stat-value">{value}</div>
       <div className="stat-label">{label}</div>
