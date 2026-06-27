@@ -176,12 +176,14 @@ async def lifespan(app: FastAPI):
     try:
         db_migration.execute(text("SELECT paid_amount FROM clients LIMIT 1"))
     except Exception:
+        db_migration.rollback()
         print("[Migration] Column clients.paid_amount not found. Adding column...")
         try:
             db_migration.execute(text("ALTER TABLE clients ADD COLUMN paid_amount FLOAT DEFAULT 0.0"))
             db_migration.commit()
             print("[Migration] Column clients.paid_amount added successfully.")
         except Exception as alter_err:
+            db_migration.rollback()
             print(f"[Migration] Failed to add paid_amount column: {alter_err}")
     finally:
         db_migration.close()

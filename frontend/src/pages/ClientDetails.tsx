@@ -158,7 +158,7 @@ export default function ClientDetails() {
                     <td style={{ fontSize: 13, fontFamily: 'monospace' }}>{c.client_mobile || '—'}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--text)' }}>${c.paid_amount.toFixed(2)}</span>
+                        <span style={{ fontWeight: 600, color: 'var(--text)' }}>₹{c.paid_amount.toFixed(2)}</span>
                         {c.client_id && (
                           <div style={{ display: 'flex', gap: '4px' }}>
                             <button
@@ -211,7 +211,7 @@ export default function ClientDetails() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <span style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)' }}>Paid Amount</span>
-                        <strong style={{ fontWeight: 600 }}>${c.paid_amount.toFixed(2)}</strong>
+                        <strong style={{ fontWeight: 600 }}>₹{c.paid_amount.toFixed(2)}</strong>
                       </div>
                       {c.client_id && (
                         <div style={{ display: 'flex', gap: '6px' }}>
