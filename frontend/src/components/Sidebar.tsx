@@ -24,11 +24,14 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-brand">
-        <span className="brand-icon">⚖</span>
-        <div>
-          <div className="brand-name">LegalCase</div>
-          <div className="brand-tagline">Management System</div>
+        <div className="sidebar-brand-left">
+          <span className="brand-icon">⚖</span>
+          <div>
+            <div className="brand-name">LegalCase</div>
+            <div className="brand-tagline">Management System</div>
+          </div>
         </div>
+        <button className="sidebar-close-btn" onClick={onClose} aria-label="Close Sidebar">×</button>
       </div>
 
       <nav className="sidebar-nav">

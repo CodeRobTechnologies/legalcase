@@ -14,10 +14,20 @@
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   padding: 0 8px 24px;
   border-bottom: 1px solid var(--sidebar-border);
   margin-bottom: 16px;
+}
+
+.sidebar-brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-close-btn {
+  display: none;
 }
 
 .brand-icon {
@@ -103,5 +113,25 @@
   }
   .sidebar.open {
     transform: translateX(0);
+  }
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    transition: all 0.2s ease;
+  }
+  .sidebar-close-btn:hover {
+    background: var(--nav-hover-bg);
+    color: var(--text);
   }
 }
