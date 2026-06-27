@@ -143,6 +143,7 @@ export default function ClientDetails() {
             <table>
               <thead>
                 <tr>
+                  <th>S.No.</th>
                   <th>Client Name</th>
                   <th>Phone Number</th>
                   <th>Paid Amount (Sum)</th>
@@ -152,8 +153,9 @@ export default function ClientDetails() {
                 </tr>
               </thead>
               <tbody>
-                {filteredClients.map(c => (
+                {filteredClients.map((c, index) => (
                   <tr key={c.id}>
+                    <td style={{ fontWeight: 600, color: 'var(--text-dim)' }}>{index + 1}</td>
                     <td><strong style={{ color: 'var(--text)' }}>{c.client_name || '—'}</strong></td>
                     <td style={{ fontSize: 13, fontFamily: 'monospace' }}>{c.client_mobile || '—'}</td>
                     <td>
@@ -200,8 +202,11 @@ export default function ClientDetails() {
           </div>
 
           <div className="mobile-cards-view">
-            {filteredClients.map(c => (
+            {filteredClients.map((c, index) => (
               <div key={c.id} className="card mobile-client-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>S.No. {index + 1}</span>
+                </div>
                 <div>
                   <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', margin: 0 }}>{c.client_name || '—'}</h3>
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 4 }}>📞 {c.client_mobile || '—'}</p>

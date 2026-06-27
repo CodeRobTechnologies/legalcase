@@ -295,10 +295,10 @@ export default function Dashboard() {
               <div className="empty-state"><span className="empty-icon">👥</span>No assistants registered</div>
             ) : (
               <div className="assistants-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '250px', overflowY: 'auto' }}>
-                {assistants.map(a => (
+                {assistants.map((a, index) => (
                   <div key={a.id} className="assistant-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--bg-elevated)' }}>
                     <div>
-                      <div style={{ fontWeight: '600' }}>{a.full_name}</div>
+                      <div style={{ fontWeight: '600' }}>{index + 1}. {a.full_name}</div>
                       <div className="text-dim" style={{ fontSize: '13px' }}>{a.email}</div>
                       <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>📞 {a.phone_number || 'No phone'}</div>
                     </div>
@@ -329,13 +329,13 @@ export default function Dashboard() {
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th><th>Case Number</th><th>Title</th><th>Status</th>
+                      <th>S.No.</th><th>Case Number</th><th>Title</th><th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {recentCases.map(c => (
+                    {recentCases.map((c, index) => (
                       <tr key={c.id}>
-                        <td>#{c.id}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--text-dim)' }}>{index + 1}</td>
                         <td>{c.case_number || '—'}</td>
                         <td>{c.title}</td>
                         <td><span className={`badge ${statusClass(c.status)}`}>{c.status}</span></td>

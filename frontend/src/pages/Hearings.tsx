@@ -231,11 +231,12 @@ export default function Hearings() {
             <div className="table-wrapper desktop-table-view">
               <table>
                 <thead>
-                  <tr><th>Case Number</th><th>Case Title</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
+                  <tr><th>S.No.</th><th>Case Number</th><th>Case Title</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
-                  {hearings.map(h => (
+                  {hearings.map((h, index) => (
                     <tr key={h.id}>
+                      <td style={{ fontWeight: 600, color: 'var(--text-dim)' }}>{index + 1}</td>
                       <td>{h.case_number || '—'}</td>
                       <td><strong style={{color:'var(--text)'}}>{h.case_title || h.title}</strong></td>
                       <td style={{fontSize:13}}>{h.hearing_date ? new Date(h.hearing_date).toLocaleString() : '—'}</td>
@@ -254,9 +255,10 @@ export default function Hearings() {
             </div>
 
             <div className="mobile-cards-view">
-              {hearings.map(h => (
+              {hearings.map((h, index) => (
                 <div key={h.id} className="card mobile-hearing-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>S.No. {index + 1}</span>
                     <span className={`badge ${statusClass(h.status)}`}>{h.status}</span>
                   </div>
                   <div>

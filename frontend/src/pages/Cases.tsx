@@ -253,12 +253,13 @@ export default function Cases() {
             <table>
               <thead>
                 <tr>
-                  <th>Case Number</th><th>Title</th><th>Description</th><th>Case Date</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
+                  <th>S.No.</th><th>Case Number</th><th>Title</th><th>Description</th><th>Case Date</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(c => (
+                {filtered.map((c, index) => (
                   <tr key={c.id}>
+                    <td style={{ fontWeight: 600, color: 'var(--text-dim)' }}>{index + 1}</td>
                     <td>{c.case_number || '—'}</td>
                     <td><strong style={{ color: 'var(--text)' }}>{c.case_title}</strong></td>
                     <td className="desc-cell">{c.case_description || '—'}</td>
@@ -306,9 +307,10 @@ export default function Cases() {
           </div>
 
           <div className="mobile-cards-view">
-            {filtered.map(c => (
+            {filtered.map((c, index) => (
               <div key={c.id} className="card mobile-case-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>S.No. {index + 1}</span>
                   <span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span>
                 </div>
                 <div>

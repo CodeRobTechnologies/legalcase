@@ -158,6 +158,7 @@ export default function Works() {
             <table>
               <thead>
                 <tr>
+                  <th>S.No.</th>
                   <th>Task</th>
                   <th>Description</th>
                   <th>Assigned {isAdmin ? 'To' : 'By'}</th>
@@ -167,8 +168,9 @@ export default function Works() {
                 </tr>
               </thead>
               <tbody>
-                {works.map((w) => (
+                {works.map((w, index) => (
                   <tr key={w.id}>
+                    <td style={{ fontWeight: 600, color: 'var(--text-dim)' }}>{index + 1}</td>
                     <td>
                       <div className="work-title-cell">
                         <strong>{w.title}</strong>
