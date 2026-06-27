@@ -214,7 +214,9 @@ def get_cases(
 
     # ADMIN
     if role == "admin":
-        pass
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        query = query.filter(Case.lawyer_id.in_([user_id] + assistant_ids))
 
     # LAWYER
     elif role == "lawyer":
@@ -568,8 +570,19 @@ def search_cases(
 
     query = db.query(Case)
 
+    from app.models.user_model import User
     if role == "lawyer":
         query = query.filter(Case.lawyer_id == user_id)
+    elif role == "admin":
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        allowed_lawyers = [user_id] + assistant_ids
+        if lawyer_id:
+            if lawyer_id in allowed_lawyers:
+                query = query.filter(Case.lawyer_id == lawyer_id)
+            else:
+                query = query.filter(Case.lawyer_id == -1)
+        else:
+            query = query.filter(Case.lawyer_id.in_(allowed_lawyers))
 
     if date:
         from sqlalchemy import func

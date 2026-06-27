@@ -68,10 +68,17 @@ def get_dashboard_data(
     hearing_query = db.query(Hearing)
     doc_query = db.query(Document)
 
+    from app.models.user_model import User
     if role == "lawyer":
         case_query = case_query.filter(Case.lawyer_id == user_id)
         hearing_query = hearing_query.join(Case).filter(Case.lawyer_id == user_id)
         doc_query = doc_query.join(Case).filter(Case.lawyer_id == user_id)
+    elif role == "admin":
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        allowed_lawyers = [user_id] + assistant_ids
+        case_query = case_query.filter(Case.lawyer_id.in_(allowed_lawyers))
+        hearing_query = hearing_query.join(Case).filter(Case.lawyer_id.in_(allowed_lawyers))
+        doc_query = doc_query.join(Case).filter(Case.lawyer_id.in_(allowed_lawyers))
 
     total_cases = case_query.count()
     active_cases = case_query.filter(Case.case_status == "Active").count()

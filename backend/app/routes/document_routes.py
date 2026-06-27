@@ -131,11 +131,13 @@ def upload_document(
 
     role = user_data.get("role")
     user_id = user_data.get("user_id")
-    if role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if role == "lawyer" and case.lawyer_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        if case.lawyer_id not in [user_id] + assistant_ids:
+            raise HTTPException(status_code=403, detail="Access denied")
 
 
 
@@ -296,11 +298,13 @@ def get_documents(
 
     role = user_data.get("role")
     user_id = user_data.get("user_id")
-    if role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if role == "lawyer" and case.lawyer_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        if case.lawyer_id not in [user_id] + assistant_ids:
+            raise HTTPException(status_code=403, detail="Access denied")
 
 
     documents = db.query(Document).filter(
@@ -418,11 +422,14 @@ def download_document(
     case = db.query(Case).filter(Case.id == document.case_id).first()
     role = user_data.get("role")
     user_id = user_data.get("user_id")
-    if case and role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if case:
+        if role == "lawyer" and case.lawyer_id != user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        elif role == "admin":
+            from app.models.user_model import User
+            assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+            if case.lawyer_id not in [user_id] + assistant_ids:
+                raise HTTPException(status_code=403, detail="Access denied")
 
 
 
@@ -486,11 +493,14 @@ def delete_document(
     case = db.query(Case).filter(Case.id == document.case_id).first()
     role = user_data.get("role")
     user_id = user_data.get("user_id")
-    if case and role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if case:
+        if role == "lawyer" and case.lawyer_id != user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        elif role == "admin":
+            from app.models.user_model import User
+            assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+            if case.lawyer_id not in [user_id] + assistant_ids:
+                raise HTTPException(status_code=403, detail="Access denied")
 
 
 

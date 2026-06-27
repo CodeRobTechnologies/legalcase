@@ -271,9 +271,13 @@ def upcoming_hearings(
     role = user_data.get("role")
     user_id = user_data.get("user_id")
 
-    query = db.query(Hearing)
+    query = db.query(Hearing).join(Case)
     if role == "lawyer":
-        query = query.join(Case).filter(Case.lawyer_id == user_id)
+        query = query.filter(Case.lawyer_id == user_id)
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        query = query.filter(Case.lawyer_id.in_([user_id] + assistant_ids))
 
     hearings = query.filter(
 
@@ -357,9 +361,13 @@ def hearing_calendar(
     role = user_data.get("role")
     user_id = user_data.get("user_id")
 
-    query = db.query(Hearing)
+    query = db.query(Hearing).join(Case)
     if role == "lawyer":
-        query = query.join(Case).filter(Case.lawyer_id == user_id)
+        query = query.filter(Case.lawyer_id == user_id)
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        query = query.filter(Case.lawyer_id.in_([user_id] + assistant_ids))
 
     hearings = query.filter(
 
@@ -458,6 +466,10 @@ def get_hearings(
     query = db.query(Hearing).join(Case)
     if role == "lawyer":
         query = query.filter(Case.lawyer_id == user_id)
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        query = query.filter(Case.lawyer_id.in_([user_id] + assistant_ids))
 
     if date:
         from sqlalchemy import func
@@ -574,13 +586,18 @@ async def update_hearing(
     role = user_data.get("role")
     user_id = user_data.get("user_id")
 
+    from app.models.user_model import User
+    assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+    allowed_lawyers = [user_id] + assistant_ids
+
     # Verify original hearing case ownership
     original_case = db.query(Case).filter(Case.id == hearing.case_id).first()
-    if original_case and role != "admin" and original_case.lawyer_id != user_id:
-        raise HTTPException(status_code=403, detail="Access denied")
+    if original_case:
+        if (role == "lawyer" and original_case.lawyer_id != user_id) or (role == "admin" and original_case.lawyer_id not in allowed_lawyers):
+            raise HTTPException(status_code=403, detail="Access denied")
 
     # Verify target case ownership
-    if role != "admin" and existing_case.lawyer_id != user_id:
+    if (role == "lawyer" and existing_case.lawyer_id != user_id) or (role == "admin" and existing_case.lawyer_id not in allowed_lawyers):
         raise HTTPException(status_code=403, detail="Access denied")
 
     old_date = hearing.hearing_date
@@ -774,11 +791,14 @@ async def delete_hearing(
     role = user_data.get("role")
     user_id = user_data.get("user_id")
     case = db.query(Case).filter(Case.id == hearing.case_id).first()
-    if case and role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if case:
+        if role == "lawyer" and case.lawyer_id != user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        elif role == "admin":
+            from app.models.user_model import User
+            assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+            if case.lawyer_id not in [user_id] + assistant_ids:
+                raise HTTPException(status_code=403, detail="Access denied")
 
 
     hearing_location = hearing.location

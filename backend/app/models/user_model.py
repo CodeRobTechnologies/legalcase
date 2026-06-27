@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from app.database import Base
 
 
@@ -18,3 +18,5 @@ class User(Base):
     phone_number = Column(String, nullable=True)
 
     google_credentials = Column(String, nullable=True)
+
+    admin_id = Column(Integer, ForeignKey("users.id"), nullable=True)

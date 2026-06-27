@@ -24,10 +24,10 @@ def create_work(
             detail="Only admin lawyers can assign work."
         )
     
-    # Verify assistant exists
-    assistant = db.query(User).filter(User.id == work.assigned_to_id).first()
+    # Verify assistant exists and belongs to this admin
+    assistant = db.query(User).filter(User.id == work.assigned_to_id, User.admin_id == user_data["user_id"]).first()
     if not assistant:
-        raise HTTPException(status_code=404, detail="Assigned assistant not found.")
+        raise HTTPException(status_code=404, detail="Assigned assistant not found or not managed by you.")
 
     new_work = Work(
         title=work.title,
@@ -64,8 +64,8 @@ def get_works(
     user_id = user_data.get("user_id")
     
     if role == "admin":
-        # Admin gets all works
-        works = db.query(Work).all()
+        # Admin gets only works they created
+        works = db.query(Work).filter(Work.created_by_id == user_id).all()
     else:
         # Assistant gets only assigned works
         works = db.query(Work).filter(Work.assigned_to_id == user_id).all()
@@ -102,9 +102,11 @@ def update_work(
         raise HTTPException(status_code=404, detail="Work not found")
         
     # Check permissions:
-    # Admin can change anything.
+    # Admin can change anything (for works they created).
     # Assistant (lawyer) can only change the status of their assigned work.
-    if role != "admin" and work.assigned_to_id != user_id:
+    if role == "lawyer" and work.assigned_to_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif role == "admin" and work.created_by_id != user_id:
         raise HTTPException(status_code=403, detail="Access denied")
         
     if role == "admin":
@@ -115,10 +117,10 @@ def update_work(
         if work_update.due_date is not None:
             work.due_date = work_update.due_date
         if work_update.assigned_to_id is not None:
-            # Verify new assistant exists
-            assistant = db.query(User).filter(User.id == work_update.assigned_to_id).first()
+            # Verify new assistant exists and belongs to this admin
+            assistant = db.query(User).filter(User.id == work_update.assigned_to_id, User.admin_id == user_id).first()
             if not assistant:
-                raise HTTPException(status_code=404, detail="Assigned assistant not found.")
+                raise HTTPException(status_code=404, detail="Assigned assistant not found or not managed by you.")
             work.assigned_to_id = work_update.assigned_to_id
             
     # Both admin and assistant can update the status
@@ -154,6 +156,10 @@ def delete_work(
     work = db.query(Work).filter(Work.id == work_id).first()
     if not work:
         raise HTTPException(status_code=404, detail="Work not found")
+        
+    # Verify the work was created by this admin
+    if work.created_by_id != user_data["user_id"]:
+        raise HTTPException(status_code=403, detail="Access denied")
         
     db.delete(work)
     db.commit()

@@ -4,7 +4,8 @@ from fastapi import (
     HTTPException,
     status,
     Body, Response,
-    Request
+    Request,
+    Header
 )
 
 from fastapi.security import (
@@ -19,7 +20,7 @@ from app.models.user_model import (
     User
 )
 
-from typing import List
+from typing import List, Optional
 from app.schemas.user_schema import (
     UserCreate,
     UserLogin,
@@ -56,7 +57,9 @@ def register_user(
 
     user: UserCreate,
 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+
+    authorization: Optional[str] = Header(None)
 ):
 
     existing_user = db.query(User).filter(
@@ -85,6 +88,20 @@ def register_user(
 
 
 
+    # Determine admin_id and role
+    admin_id = user.admin_id
+    role = user.role or "lawyer"
+
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+        try:
+            user_data = verify_token(token)
+            if user_data and user_data.get("role") == "admin":
+                admin_id = user_data.get("user_id")
+                role = "lawyer"
+        except Exception:
+            pass
+
     # CREATE USER
     new_user = User(
 
@@ -94,9 +111,11 @@ def register_user(
 
         password=hashed_password,
 
-        role="lawyer",
+        role=role,
 
-        phone_number=user.phone_number
+        phone_number=user.phone_number,
+
+        admin_id=admin_id
     )
 
     db.add(new_user)
@@ -380,6 +399,9 @@ def get_assistants(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required"
         )
-    # Assistants are all users with role "lawyer"
-    assistants = db.query(User).filter(User.role == "lawyer").all()
+    # Assistants are all users with role "lawyer" managed by this admin
+    assistants = db.query(User).filter(
+        User.role == "lawyer",
+        User.admin_id == admin_db_user.id
+    ).all()
     return assistants

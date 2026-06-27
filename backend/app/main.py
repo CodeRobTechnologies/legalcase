@@ -204,6 +204,22 @@ async def lifespan(app: FastAPI):
     finally:
         db_migration.close()
 
+    db_migration = SessionLocal()
+    try:
+        db_migration.execute(text("SELECT admin_id FROM users LIMIT 1"))
+    except Exception:
+        db_migration.rollback()
+        print("[Migration] Column users.admin_id not found. Adding column...")
+        try:
+            db_migration.execute(text("ALTER TABLE users ADD COLUMN admin_id INTEGER"))
+            db_migration.commit()
+            print("[Migration] Column users.admin_id added successfully.")
+        except Exception as alter_err:
+            db_migration.rollback()
+            print(f"[Migration] Failed to add admin_id column: {alter_err}")
+    finally:
+        db_migration.close()
+
     # AUTO-SEED ADMIN USER
     from app.database import SessionLocal
     from app.models.user_model import User
