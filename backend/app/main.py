@@ -220,38 +220,76 @@ async def lifespan(app: FastAPI):
     finally:
         db_migration.close()
 
-    # AUTO-SEED ADMIN USER
+    # AUTO-SEED ADMIN USERS & ASSISTANTS
     from app.database import SessionLocal
     from app.models.user_model import User
     from app.services.auth_service import hash_password
 
     db = SessionLocal()
     try:
-        admin_email = "admin@example.com"
-        admin_pass = "admin123"
-        admin_exists = db.query(User).filter(User.role == "admin").first()
-        if not admin_exists:
-            email_exists = db.query(User).filter(User.email == admin_email).first()
-            if not email_exists:
-                admin_user = User(
-                    full_name="Admin Lawyer",
-                    email=admin_email,
-                    password=hash_password(admin_pass),
-                    role="admin",
-                    phone_number="123-456-7890",
-                )
-                db.add(admin_user)
-                db.commit()
-                db.refresh(admin_user)
-                print(f"[Lifespan Seed] Created default admin user: {admin_email}")
-            else:
-                email_exists.role = "admin"
-                db.commit()
-                print(f"[Lifespan Seed] Updated existing user {admin_email} to admin role")
+        # 1. First Admin
+        admin1_email = "admin@example.com"
+        admin1_pass = "admin123"
+        admin1 = db.query(User).filter(User.email == admin1_email).first()
+        if not admin1:
+            admin1 = User(
+                full_name="Admin Lawyer",
+                email=admin1_email,
+                password=hash_password(admin1_pass),
+                role="admin",
+                phone_number="123-456-7890",
+            )
+            db.add(admin1)
+            db.commit()
+            db.refresh(admin1)
+            print(f"[Lifespan Seed] Created first admin: {admin1_email}")
         else:
-            print(f"[Lifespan Seed] Admin user already exists: {admin_exists.email}")
+            if admin1.role != "admin":
+                admin1.role = "admin"
+                db.commit()
+                print(f"[Lifespan Seed] Updated {admin1_email} to admin role")
+
+        # 2. Second Admin
+        admin2_email = "admin2@example.com"
+        admin2_pass = "admin123"
+        admin2 = db.query(User).filter(User.email == admin2_email).first()
+        if not admin2:
+            admin2 = User(
+                full_name="Second Admin Lawyer",
+                email=admin2_email,
+                password=hash_password(admin2_pass),
+                role="admin",
+                phone_number="123-456-7890",
+            )
+            db.add(admin2)
+            db.commit()
+            db.refresh(admin2)
+            print(f"[Lifespan Seed] Created second admin: {admin2_email}")
+        else:
+            if admin2.role != "admin":
+                admin2.role = "admin"
+                db.commit()
+                print(f"[Lifespan Seed] Updated {admin2_email} to admin role")
+
+        # 3. Assistants for Second Admin
+        for i in range(1, 4):
+            asst_email = f"assistant{i}_admin2@example.com"
+            asst_pass = "assistant123"
+            asst = db.query(User).filter(User.email == asst_email).first()
+            if not asst:
+                asst = User(
+                    full_name=f"Admin 2 Assistant {i}",
+                    email=asst_email,
+                    password=hash_password(asst_pass),
+                    role="lawyer",
+                    phone_number=f"123-456-789{i}",
+                    admin_id=admin2.id
+                )
+                db.add(asst)
+                db.commit()
+                print(f"[Lifespan Seed] Created assistant {i} for second admin: {asst_email}")
     except Exception as e:
-        print(f"[Lifespan Seed] Error auto-seeding admin: {e}")
+        print(f"[Lifespan Seed] Error auto-seeding admins and assistants: {e}")
     finally:
         db.close()
 
