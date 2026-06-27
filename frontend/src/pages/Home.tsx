@@ -1,8 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from '../lib/auth';
-import heroImg from '../assets/courtroom_hero.png';
+import { motion } from 'framer-motion';
 import './Home.css';
+
+function FadeInUpSection({ children, className, id, style }: { children: React.ReactNode; className?: string; id?: string; style?: React.CSSProperties }) {
+  return (
+    <motion.section
+      id={id}
+      className={className}
+      style={style}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+    >
+      {children}
+    </motion.section>
+  );
+}
 
 export default function Home() {
   const navigate = useNavigate();
@@ -41,45 +57,56 @@ export default function Home() {
           <a href="#testimonials">Testimonials</a>
         </nav>
         <div className="header-actions">
-          <button 
+          <motion.button 
             type="button" 
             className="btn btn-primary"
             onClick={() => navigate(isLoggedIn ? '/dashboard' : '/login')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {isLoggedIn ? 'Go to Dashboard' : 'Lawyer Login'}
-          </button>
+          </motion.button>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="hero-section" style={{ backgroundImage: `linear-gradient(rgba(28, 28, 28, 0.85), rgba(28, 28, 28, 0.85)), url(${heroImg})` }}>
-        <div className="hero-content">
+      <section className="hero-section" style={{ backgroundImage: `linear-gradient(rgba(28, 28, 28, 0.85), rgba(28, 28, 28, 0.85)), url("/images/courtroom_hero.png")` }}>
+        <motion.div 
+          className="hero-content"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <span className="hero-gold-tag">Est. 2001 &bull; Prestige & Integrity</span>
           <h1 className="hero-title">Justice. Integrity. Results.</h1>
           <p className="hero-subtitle">
             Providing sophisticated case management, calendar tracking, and invoicing solutions tailored for distinguished law firms and legal counsels.
           </p>
           <div className="hero-actions">
-            <button 
+            <motion.button 
               type="button" 
               className="btn btn-primary btn-lg"
               onClick={() => navigate(isLoggedIn ? '/dashboard' : '/login')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Access System
-            </button>
-            <button 
+            </motion.button>
+            <motion.button 
               type="button" 
               className="btn btn-secondary btn-lg"
               onClick={() => setShowContactModal(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Contact Counsel
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="section-padding features-section">
+      <FadeInUpSection id="features" className="section-padding features-section">
         <div className="section-header-centered">
           <span className="section-tag">System Capabilities</span>
           <h2 className="section-title">Designed for Corporate & Trial Litigation</h2>
@@ -87,31 +114,31 @@ export default function Home() {
         </div>
         
         <div className="grid-cards-container">
-          <div className="card feature-card">
+          <motion.div className="card feature-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="feature-icon-wrapper">⚖️</div>
             <h3>Case Lifecycle</h3>
             <p>Monitor litigation records, timeline events, and lawyer assignments privately in real-time.</p>
-          </div>
-          <div className="card feature-card">
+          </motion.div>
+          <motion.div className="card feature-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="feature-icon-wrapper">🏛️</div>
             <h3>Hearings Calendar</h3>
             <p>Synchronize future court hearings, venues, and status logs with client search parameters.</p>
-          </div>
-          <div className="card feature-card">
+          </motion.div>
+          <motion.div className="card feature-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="feature-icon-wrapper">📜</div>
             <h3>Client Invoicing</h3>
             <p>Record, credit, and adjust payment summaries with local currency support (₹) instantly.</p>
-          </div>
-          <div className="card feature-card">
+          </motion.div>
+          <motion.div className="card feature-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="feature-icon-wrapper">👨‍⚖️</div>
             <h3>Assistant Scoping</h3>
             <p>Link and manage multiple assistant lawyers, keeping cases and files isolated dynamically.</p>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </FadeInUpSection>
 
       {/* Practice Areas Section */}
-      <section id="practice-areas" className="section-padding practice-areas-section">
+      <FadeInUpSection id="practice-areas" className="section-padding practice-areas-section">
         <div className="section-header-centered">
           <span className="section-tag">Practice Focus</span>
           <h2 className="section-title">Areas of Legal Excellence</h2>
@@ -119,68 +146,68 @@ export default function Home() {
         </div>
 
         <div className="grid-cards-container">
-          <div className="card practice-card">
+          <motion.div className="card practice-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="practice-header">
               <span className="practice-num">01</span>
               <h3>Criminal Law</h3>
             </div>
             <p>Defense representation, prosecution oversight, corporate fraud, and trial proceedings.</p>
-          </div>
-          <div className="card practice-card">
+          </motion.div>
+          <motion.div className="card practice-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="practice-header">
               <span className="practice-num">02</span>
               <h3>Civil Law</h3>
             </div>
             <p>Breach of contract, property disputes, civil liability, tort litigation, and recovery.</p>
-          </div>
-          <div className="card practice-card">
+          </motion.div>
+          <motion.div className="card practice-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="practice-header">
               <span className="practice-num">03</span>
               <h3>Corporate Law</h3>
             </div>
-            <p>Mergers and acquisitions, regulatory compliance, equity structures, and advisor contracts.</p>
-          </div>
-          <div className="card practice-card">
+            <p>Mergers and acquisitions, regulatory compliance, equity structures, and advisory contracts.</p>
+          </motion.div>
+          <motion.div className="card practice-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="practice-header">
               <span className="practice-num">04</span>
               <h3>Family Law</h3>
             </div>
             <p>Estate planning, divorce mediation, trust settlements, custody, and probate administration.</p>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </FadeInUpSection>
 
       {/* Why Choose Us Section */}
-      <section id="why-choose-us" className="section-padding why-choose-us-section">
+      <FadeInUpSection id="why-choose-us" className="section-padding why-choose-us-section">
         <div className="why-content-wrapper">
           <div className="why-left">
             <span className="section-tag">Why Choose Us</span>
             <h2 className="section-title">An Authority in Legal Advisory and Litigation</h2>
             <p>We blend legacy legal values with refined modern workflows, ensuring absolute compliance and security.</p>
             <div className="stats-box-grid">
-              <div className="stat-box">
+              <motion.div className="stat-box" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                 <span className="stat-num">25+</span>
                 <span className="stat-label">Years of Experience</span>
-              </div>
-              <div className="stat-box">
+              </motion.div>
+              <motion.div className="stat-box" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                 <span className="stat-num">98%</span>
                 <span className="stat-label">Case Success Rate</span>
-              </div>
-              <div className="stat-box">
+              </motion.div>
+              <motion.div className="stat-box" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                 <span className="stat-num">10k+</span>
                 <span className="stat-label">Satisfied Clients</span>
-              </div>
-              <div className="stat-box">
+              </motion.div>
+              <motion.div className="stat-box" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                 <span className="stat-num">24/7</span>
                 <span className="stat-label">Premium Support</span>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
-      </section>
+      </FadeInUpSection>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="section-padding testimonials-section">
+      <FadeInUpSection id="testimonials" className="section-padding testimonials-section">
         <div className="section-header-centered">
           <span className="section-tag">Client Reviews</span>
           <h2 className="section-title">Endorsements from Trusted Entities</h2>
@@ -188,7 +215,7 @@ export default function Home() {
         </div>
 
         <div className="grid-cards-container">
-          <div className="card testimonial-card">
+          <motion.div className="card testimonial-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="rating">⭐⭐⭐⭐⭐</div>
             <p className="testi-text">
               "The level of transparency, professionalism, and commitment to justice demonstrated here is truly unparalleled. Highly recommended."
@@ -197,8 +224,8 @@ export default function Home() {
               <strong>Devendra K. Sharma</strong>
               <span>CEO, Sharma Ventures</span>
             </div>
-          </div>
-          <div className="card testimonial-card">
+          </motion.div>
+          <motion.div className="card testimonial-card" whileHover={{ y: -6, borderColor: '#C8A96A' }} transition={{ duration: 0.25 }}>
             <div className="rating">⭐⭐⭐⭐⭐</div>
             <p className="testi-text">
               "Absolute isolation of data, clear invoices, and precise scheduling. Their system works flawlessly."
@@ -207,24 +234,26 @@ export default function Home() {
               <strong>Priya R. Sen</strong>
               <span>General Counsel, TechCorp</span>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </FadeInUpSection>
 
       {/* Call to Action Section */}
-      <section className="cta-section">
+      <FadeInUpSection className="cta-section">
         <div className="cta-content">
           <h2 className="cta-title">Require Elite Legal Counsel?</h2>
           <p className="cta-desc">Speak with our senior advocates to discuss case representation and advisory schedules.</p>
-          <button 
+          <motion.button 
             type="button" 
             className="btn btn-primary btn-lg"
             onClick={() => setShowContactModal(true)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             Submit Inquiry
-          </button>
+          </motion.button>
         </div>
-      </section>
+      </FadeInUpSection>
 
       {/* Premium Footer */}
       <footer className="home-footer">
@@ -255,7 +284,13 @@ export default function Home() {
       {/* Contact Inquiry Modal */}
       {showContactModal && (
         <div className="modal-overlay" onClick={() => setShowContactModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+          <motion.div 
+            className="modal" 
+            onClick={e => e.stopPropagation()}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", damping: 25, stiffness: 350 }}
+          >
             <h2 className="modal-title">Consultation Inquiry</h2>
             {contactSuccess ? (
               <div className="alert alert-success">Your message has been sent to our counselors.</div>
@@ -295,11 +330,18 @@ export default function Home() {
                 </div>
                 <div className="modal-actions" style={{ marginTop: '20px' }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowContactModal(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-primary">Submit Inquiry</button>
+                  <motion.button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Submit Inquiry
+                  </motion.button>
                 </div>
               </form>
             )}
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
