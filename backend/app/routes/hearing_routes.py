@@ -1,7 +1,8 @@
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException
+    HTTPException,
+    Query
 )
 from sqlalchemy.exc import IntegrityError
 
@@ -444,19 +445,40 @@ def hearing_calendar(
 
 @router.get("/")
 def get_hearings(
-
+    date: Optional[str] = Query(None),
+    client_name: Optional[str] = Query(None),
+    case_number: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-
     user_data: dict = Depends(verify_token)
-
 ):
 
     role = user_data.get("role")
     user_id = user_data.get("user_id")
 
-    query = db.query(Hearing)
+    query = db.query(Hearing).join(Case)
     if role == "lawyer":
-        query = query.join(Case).filter(Case.lawyer_id == user_id)
+        query = query.filter(Case.lawyer_id == user_id)
+
+    if date:
+        from sqlalchemy import func
+        try:
+            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+            query = query.filter(func.date(Hearing.hearing_date) == date_obj)
+        except ValueError:
+            pass
+
+    if client_name:
+        from app.models.client_model import Client
+        from sqlalchemy import or_
+        query = query.filter(
+            or_(
+                Case.client.has(Client.client_name.ilike(f"%{client_name}%")),
+                Case.clients.any(Client.client_name.ilike(f"%{client_name}%"))
+            )
+        )
+
+    if case_number:
+        query = query.filter(Case.case_number.ilike(f"%{case_number}%"))
 
     hearings = query.order_by(
 

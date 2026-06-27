@@ -34,6 +34,9 @@ export default function Hearings() {
   const [saving, setSaving]       = useState(false);
   const [formError, setFormError] = useState('');
   const [caseSearch, setCaseSearch] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [clientSearch, setClientSearch] = useState('');
+  const [caseNumberSearch, setCaseNumberSearch] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -91,8 +94,13 @@ export default function Hearings() {
     await Promise.resolve();
     setLoading(true);
     try {
+      const params: any = {};
+      if (searchDate) params.date = searchDate;
+      if (clientSearch) params.client_name = clientSearch;
+      if (caseNumberSearch) params.case_number = caseNumberSearch;
+
       const [hearingsRes, casesRes] = await Promise.all([
-        api.get('/hearings/'),
+        api.get('/hearings/', { params }),
         api.get('/cases/')
       ]);
       setHearings(hearingsRes.data);
@@ -104,7 +112,7 @@ export default function Hearings() {
     }
   };
 
-  useEffect(() => { fetchHearings(); }, []);
+  useEffect(() => { fetchHearings(); }, [searchDate, clientSearch, caseNumberSearch]);
 
   const openAdd  = () => { setForm(EMPTY); setFormError(''); setCaseSearch(''); setShowAdd(true); };
   const openEdit = (h: Hearing) => {
@@ -169,6 +177,48 @@ export default function Hearings() {
         >
           Calendar View
         </button>
+      </div>
+
+      {/* Filters */}
+      <div className="filters" style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <input
+          type="date"
+          className="form-input"
+          value={searchDate}
+          onChange={e => setSearchDate(e.target.value)}
+          id="hearing-date-search"
+          title="Search by hearing date"
+          style={{ flex: 1, minWidth: '150px' }}
+        />
+        <input
+          className="form-input search-input"
+          placeholder="Search client name…"
+          value={clientSearch}
+          onChange={e => setClientSearch(e.target.value)}
+          id="client-search"
+          style={{ flex: 1, minWidth: '180px' }}
+        />
+        <input
+          className="form-input search-input"
+          placeholder="Search case number…"
+          value={caseNumberSearch}
+          onChange={e => setCaseNumberSearch(e.target.value)}
+          id="case-number-search"
+          style={{ flex: 1, minWidth: '180px' }}
+        />
+        {(searchDate || clientSearch || caseNumberSearch) && (
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              setSearchDate('');
+              setClientSearch('');
+              setCaseNumberSearch('');
+            }}
+          >
+            Clear Filters
+          </button>
+        )}
       </div>
 
       {loading ? (
