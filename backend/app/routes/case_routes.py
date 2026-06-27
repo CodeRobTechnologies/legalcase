@@ -91,7 +91,7 @@ def create_case(
 
     role = user_data.get("role")
     user_id = user_data.get("user_id")
-    assigned_lawyer_id = user_id if role == "lawyer" else case.lawyer_id
+    assigned_lawyer_id = user_id if role == "lawyer" else (case.lawyer_id or user_id)
 
     clients_to_associate = []
 
@@ -264,11 +264,13 @@ def get_case(
             detail="Case not found"
         )
 
-    if role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if role == "lawyer" and case.lawyer_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        if case.lawyer_id not in [user_id] + assistant_ids:
+            raise HTTPException(status_code=403, detail="Access denied")
 
     return case
 
@@ -307,11 +309,13 @@ def update_case(
             detail="Case not found"
         )
 
-    if role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if role == "lawyer" and case.lawyer_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        if case.lawyer_id not in [user_id] + assistant_ids:
+            raise HTTPException(status_code=403, detail="Access denied")
 
 
 
@@ -506,11 +510,13 @@ def delete_case(
             detail="Case not found"
         )
 
-    if role != "admin" and case.lawyer_id != user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="Access denied"
-        )
+    if role == "lawyer" and case.lawyer_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif role == "admin":
+        from app.models.user_model import User
+        assistant_ids = [u.id for u in db.query(User).filter(User.admin_id == user_id).all()]
+        if case.lawyer_id not in [user_id] + assistant_ids:
+            raise HTTPException(status_code=403, detail="Access denied")
 
 
 
