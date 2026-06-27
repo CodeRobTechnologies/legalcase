@@ -76,7 +76,7 @@ export default function Login() {
             className={`role-tab ${roleMode === 'assistant' ? 'active' : ''}`}
             onClick={() => handleRoleChange('assistant')}
           >
-            Assistant Login
+            Login
           </button>
           <button
             type="button"
