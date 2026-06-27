@@ -6,12 +6,14 @@ from typing import Optional, List
 class ClientCreate(BaseModel):
     client_name: str
     mobile_number: Optional[str] = None
+    paid_amount: Optional[float] = 0.0
 
 
 class ClientResponse(BaseModel):
     id: int
     client_name: str
     mobile_number: Optional[str] = None
+    paid_amount: float
 
     class Config:
         from_attributes = True
@@ -54,6 +56,7 @@ class CaseResponse(BaseModel):
     client_id: Optional[int] = None
     client_name: Optional[str] = None
     client_mobile: Optional[str] = None
+    client_paid_amount: Optional[float] = 0.0
     clients: List[ClientResponse] = []
     created_at: datetime
 

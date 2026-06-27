@@ -169,6 +169,23 @@ async def lifespan(app: FastAPI):
         "Database tables created successfully"
     )
 
+    # RUN AUTO-MIGRATIONS (E.G. ENSURE COLUMN PAID_AMOUNT EXISTS)
+    from app.database import SessionLocal
+    from sqlalchemy import text
+    db_migration = SessionLocal()
+    try:
+        db_migration.execute(text("SELECT paid_amount FROM clients LIMIT 1"))
+    except Exception:
+        print("[Migration] Column clients.paid_amount not found. Adding column...")
+        try:
+            db_migration.execute(text("ALTER TABLE clients ADD COLUMN paid_amount FLOAT DEFAULT 0.0"))
+            db_migration.commit()
+            print("[Migration] Column clients.paid_amount added successfully.")
+        except Exception as alter_err:
+            print(f"[Migration] Failed to add paid_amount column: {alter_err}")
+    finally:
+        db_migration.close()
+
     # AUTO-SEED ADMIN USER
     from app.database import SessionLocal
     from app.models.user_model import User

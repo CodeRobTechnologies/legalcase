@@ -151,6 +151,10 @@ class Case(Base):
     def client_mobile(self) -> Optional[str]:
         return self.client.mobile_number if self.client else None
 
+    @property
+    def client_paid_amount(self) -> Optional[float]:
+        return self.client.paid_amount if self.client else 0.0
+
 
 
     # =========================

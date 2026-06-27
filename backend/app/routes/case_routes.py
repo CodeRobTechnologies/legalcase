@@ -632,3 +632,35 @@ def advanced_search(
 
 
     return cases
+
+# =========================
+# ADJUST CLIENT PAYMENT SUM
+# =========================
+
+from pydantic import BaseModel
+
+class PaymentAdjustment(BaseModel):
+    amount: float
+    operation: str # "add" or "subtract"
+
+@router.put("/clients/{client_id}/payment")
+def adjust_client_payment(
+    client_id: int,
+    adjustment: PaymentAdjustment,
+    db: Session = Depends(get_db),
+    user_data: dict = Depends(verify_token)
+):
+    client = db.query(Client).filter(Client.id == client_id).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+        
+    if adjustment.operation == "add":
+        client.paid_amount += adjustment.amount
+    elif adjustment.operation == "subtract":
+        client.paid_amount = max(0.0, client.paid_amount - adjustment.amount)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid operation. Must be 'add' or 'subtract'")
+        
+    db.commit()
+    db.refresh(client)
+    return {"message": "Payment adjusted successfully", "paid_amount": client.paid_amount}
