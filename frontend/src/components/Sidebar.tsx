@@ -11,11 +11,21 @@ const NAV = [
   { to: '/clients',    icon: '👥', label: 'Client Details' },
   { to: '/documents', icon: '📄', label: 'Documents' },
   { to: '/works',     icon: '💼', label: 'Works' },
+  { to: '/assistants', icon: '👥', label: 'Assistants' },
   { to: '/account',   icon: '👤', label: 'Account Info' },
 ];
 
 export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const navigate = useNavigate();
+  const userRole = localStorage.getItem('user_role') || 'lawyer';
+  const isAdmin = userRole === 'admin';
+
+  const navItems = NAV.filter(item => {
+    if (item.to === '/assistants') {
+      return isAdmin;
+    }
+    return true;
+  });
 
   const handleLogout = () => {
     clearSession();
@@ -36,7 +46,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
       </div>
 
       <nav className="sidebar-nav">
-        {NAV.map(({ to, icon, label }) => (
+        {navItems.map(({ to, icon, label }) => (
           <NavLink
             key={to}
             to={to}
