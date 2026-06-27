@@ -303,7 +303,6 @@ export default function Dashboard() {
                       <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>📞 {a.phone_number || 'No phone'}</div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                      <span className="text-dim" style={{ fontSize: '11px' }}>ID: #{a.id}</span>
                       <button
                         type="button"
                         className="btn btn-danger btn-sm"

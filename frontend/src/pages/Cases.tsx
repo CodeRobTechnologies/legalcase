@@ -253,13 +253,12 @@ export default function Cases() {
             <table>
               <thead>
                 <tr>
-                  <th>ID</th><th>Case Number</th><th>Title</th><th>Description</th><th>Case Date</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
+                  <th>Case Number</th><th>Title</th><th>Description</th><th>Case Date</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(c => (
                   <tr key={c.id}>
-                    <td>#{c.id}</td>
                     <td>{c.case_number || '—'}</td>
                     <td><strong style={{ color: 'var(--text)' }}>{c.case_title}</strong></td>
                     <td className="desc-cell">{c.case_description || '—'}</td>
@@ -309,8 +308,7 @@ export default function Cases() {
           <div className="mobile-cards-view">
             {filtered.map(c => (
               <div key={c.id} className="card mobile-case-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>#{c.id}</span>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span>
                 </div>
                 <div>
@@ -489,7 +487,7 @@ export default function Cases() {
                   <span className={`badge ${statusClass(viewCase.case_status)}`}>{viewCase.case_status}</span>
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>
-                  Case Number: {viewCase.case_number || '—'} | ID: #{viewCase.id}
+                  Case Number: {viewCase.case_number || '—'}
                 </p>
               </div>
               <button 

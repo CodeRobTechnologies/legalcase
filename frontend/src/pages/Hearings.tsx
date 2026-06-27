@@ -231,12 +231,11 @@ export default function Hearings() {
             <div className="table-wrapper desktop-table-view">
               <table>
                 <thead>
-                  <tr><th>ID</th><th>Case Number</th><th>Case Title</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
+                  <tr><th>Case Number</th><th>Case Title</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                   {hearings.map(h => (
                     <tr key={h.id}>
-                      <td>#{h.id}</td>
                       <td>{h.case_number || '—'}</td>
                       <td><strong style={{color:'var(--text)'}}>{h.case_title || h.title}</strong></td>
                       <td style={{fontSize:13}}>{h.hearing_date ? new Date(h.hearing_date).toLocaleString() : '—'}</td>
@@ -257,8 +256,7 @@ export default function Hearings() {
             <div className="mobile-cards-view">
               {hearings.map(h => (
                 <div key={h.id} className="card mobile-hearing-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500 }}>#{h.id}</span>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <span className={`badge ${statusClass(h.status)}`}>{h.status}</span>
                   </div>
                   <div>
