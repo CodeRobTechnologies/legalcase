@@ -24,6 +24,7 @@ class CaseCreate(BaseModel):
     case_title: str
     case_description: str
     case_number: Optional[str] = None
+    case_date: Optional[datetime] = None
     lawyer_id: Optional[int] = None
     client_id: Optional[int] = None
     client_name: Optional[str] = None
@@ -37,6 +38,7 @@ class CaseUpdate(BaseModel):
     case_description: Optional[str] = None
     case_number: Optional[str] = None
     case_status: Optional[str] = None
+    case_date: Optional[datetime] = None
     lawyer_id: Optional[int] = None
     client_id: Optional[int] = None
     client_name: Optional[str] = None
@@ -57,6 +59,7 @@ class CaseResponse(BaseModel):
     client_name: Optional[str] = None
     client_mobile: Optional[str] = None
     client_paid_amount: Optional[float] = 0.0
+    case_date: Optional[datetime] = None
     clients: List[ClientResponse] = []
     created_at: datetime
 

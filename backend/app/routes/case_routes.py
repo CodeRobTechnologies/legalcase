@@ -139,6 +139,7 @@ def create_case(
         case_title=case.case_title,
         case_description=case.case_description,
         case_number=case.case_number,
+        case_date=case.case_date,
         lawyer_id=assigned_lawyer_id,
         client_id=primary_client_id,
         case_status="Open"
@@ -195,6 +196,8 @@ def get_cases(
     skip: int = Query(0),
 
     limit: int = Query(100),
+
+    date: Optional[str] = Query(None),
 
     db: Session = Depends(get_db),
 
@@ -329,6 +332,11 @@ def update_case(
     if updated_case.case_status is not None:
 
         case.case_status = updated_case.case_status
+
+
+    if updated_case.case_date is not None:
+
+        case.case_date = updated_case.case_date
 
 
     if role == "admin":
@@ -550,6 +558,7 @@ def search_cases(
     title: Optional[str] = None,
     status: Optional[str] = None,
     lawyer_id: Optional[int] = None,
+    date: Optional[str] = None,
     db: Session = Depends(get_db),
     user_data: dict = Depends(verify_token)
 ):
@@ -561,6 +570,15 @@ def search_cases(
 
     if role == "lawyer":
         query = query.filter(Case.lawyer_id == user_id)
+
+    if date:
+        from sqlalchemy import func
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+            query = query.filter(func.date(Case.case_date) == date_obj)
+        except ValueError:
+            pass
 
     if title:
 
@@ -578,6 +596,15 @@ def search_cases(
         query = query.filter(
             Case.case_status == status
         )
+
+    if date:
+        from sqlalchemy import func
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+            query = query.filter(func.date(Case.case_date) == date_obj)
+        except ValueError:
+            pass
 
     return query.order_by(
         Case.id.desc()

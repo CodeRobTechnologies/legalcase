@@ -13,6 +13,7 @@ type Case = {
   id: number;
   case_title: string;
   case_number?: string | null;
+  case_date?: string | null;
   case_description: string;
   case_status: string;
   lawyer_id: number | null;
@@ -30,6 +31,7 @@ type ClientForm = {
 type CaseForm = {
   case_title: string;
   case_number: string;
+  case_date: string;
   case_description: string;
   lawyer_id: string;
   case_status: string;
@@ -39,6 +41,7 @@ type CaseForm = {
 const EMPTY: CaseForm = {
   case_title: '',
   case_number: '',
+  case_date: '',
   case_description: '',
   lawyer_id: '',
   case_status: '',
@@ -52,6 +55,7 @@ export default function Cases() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [clientSearch, setClientSearch] = useState('');
+  const [searchDate, setSearchDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
   // Modal state
@@ -72,7 +76,11 @@ export default function Cases() {
   const fetchCases = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/cases/');
+      const params: any = {};
+      if (searchDate) {
+        params.date = searchDate;
+      }
+      const res = await api.get('/cases/', { params });
       setCases(res.data);
     } catch {
       setError('Failed to load cases.');
@@ -108,7 +116,7 @@ export default function Cases() {
   };
 
   // Fetch clients for dropdown
-  useEffect(() => { fetchCases(); }, []);
+  useEffect(() => { fetchCases(); }, [searchDate]);
 
   const filtered = cases.filter(c => {
     const matchSearch = c.case_title.toLowerCase().includes(search.toLowerCase()) ||
@@ -129,6 +137,7 @@ export default function Cases() {
     setForm({
       case_title: c.case_title,
       case_number: c.case_number ?? '',
+      case_date: c.case_date ? c.case_date.split('T')[0] : '',
       case_description: c.case_description,
       lawyer_id: String(c.lawyer_id ?? ''),
       case_status: c.case_status,
@@ -147,6 +156,7 @@ export default function Cases() {
         case_title: form.case_title,
         case_description: form.case_description,
         case_number: form.case_number.trim() || null,
+        case_date: form.case_date ? new Date(form.case_date).toISOString() : null,
         lawyer_id: form.lawyer_id ? Number(form.lawyer_id) : null,
         case_status: form.case_status || 'Open',
         clients: form.clients.filter(cl => cl.client_name.trim() !== '').map(cl => ({
@@ -210,10 +220,27 @@ export default function Cases() {
           onChange={e => setClientSearch(e.target.value)}
           id="client-search"
         />
+        <input
+          type="date"
+          className="form-input"
+          value={searchDate}
+          onChange={e => setSearchDate(e.target.value)}
+          id="case-date-search"
+          title="Search by case date"
+        />
         <select className="form-input" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} id="case-status-filter">
           <option value="">All Statuses</option>
           {['Open', 'Active', 'Pending', 'Closed'].map(s => <option key={s}>{s}</option>)}
         </select>
+        {searchDate && (
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => setSearchDate('')}
+          >
+            Clear Date
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -226,7 +253,7 @@ export default function Cases() {
             <table>
               <thead>
                 <tr>
-                  <th>ID</th><th>Case Number</th><th>Title</th><th>Description</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
+                  <th>ID</th><th>Case Number</th><th>Title</th><th>Description</th><th>Case Date</th><th>Status</th><th>Client Name</th><th>Mobile Number</th><th>Lawyer ID</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -236,6 +263,7 @@ export default function Cases() {
                     <td>{c.case_number || '—'}</td>
                     <td><strong style={{ color: 'var(--text)' }}>{c.case_title}</strong></td>
                     <td className="desc-cell">{c.case_description || '—'}</td>
+                    <td>{c.case_date ? new Date(c.case_date).toLocaleDateString([], { dateStyle: 'medium' }) : '—'}</td>
                     <td><span className={`badge ${statusClass(c.case_status)}`}>{c.case_status}</span></td>
                     <td>
                       {c.clients && c.clients.length > 0 ? (
@@ -290,6 +318,9 @@ export default function Cases() {
                   {c.case_number && (
                     <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Case Number: {c.case_number}</p>
                   )}
+                  {c.case_date && (
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Case Date: {new Date(c.case_date).toLocaleDateString([], { dateStyle: 'medium' })}</p>
+                  )}
                 </div>
                 {c.case_description && (
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineClamp: 2, WebkitLineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -333,6 +364,10 @@ export default function Cases() {
               <div className="form-group">
                 <label className="form-label">Title *</label>
                 <input className="form-input" value={form.case_title} onChange={e => setForm({ ...form, case_title: e.target.value })} placeholder="Case title" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Case Date</label>
+                <input type="date" className="form-input" value={form.case_date} onChange={e => setForm({ ...form, case_date: e.target.value })} />
               </div>
               <div className="form-group">
                 <label className="form-label">Case Number</label>

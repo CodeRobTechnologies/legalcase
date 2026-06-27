@@ -188,6 +188,22 @@ async def lifespan(app: FastAPI):
     finally:
         db_migration.close()
 
+    db_migration = SessionLocal()
+    try:
+        db_migration.execute(text("SELECT case_date FROM cases LIMIT 1"))
+    except Exception:
+        db_migration.rollback()
+        print("[Migration] Column cases.case_date not found. Adding column...")
+        try:
+            db_migration.execute(text("ALTER TABLE cases ADD COLUMN case_date TIMESTAMP"))
+            db_migration.commit()
+            print("[Migration] Column cases.case_date added successfully.")
+        except Exception as alter_err:
+            db_migration.rollback()
+            print(f"[Migration] Failed to add case_date column: {alter_err}")
+    finally:
+        db_migration.close()
+
     # AUTO-SEED ADMIN USER
     from app.database import SessionLocal
     from app.models.user_model import User

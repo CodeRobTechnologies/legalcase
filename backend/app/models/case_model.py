@@ -89,6 +89,13 @@ class Case(Base):
         nullable=False
     )
 
+    case_date = Column(
+
+        DateTime,
+
+        nullable=True
+    )
+
 
 
     # =========================
