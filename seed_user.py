@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
+if os.path.exists("backend/.env"):
+    load_dotenv("backend/.env")
+else:
+    load_dotenv()
 
 from app.database import Base, engine, SessionLocal
 from app.models.user_model import User
