@@ -6,20 +6,15 @@ import './Login.css';
 export default function Login() {
   const navigate = useNavigate();
   const [roleMode, setRoleMode] = useState<'assistant' | 'admin'>('assistant');
-  const [email, setEmail]       = useState('lawyer@example.com');
-  const [password, setPassword] = useState('Password123!');
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
 
   const handleRoleChange = (mode: 'assistant' | 'admin') => {
     setRoleMode(mode);
-    if (mode === 'assistant') {
-      setEmail('lawyer@example.com');
-      setPassword('Password123!');
-    } else {
-      setEmail('admin@example.com');
-      setPassword('admin123');
-    }
+    setEmail('');
+    setPassword('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

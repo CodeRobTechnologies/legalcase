@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
+if not DATABASE_URL or DATABASE_URL == "sqlite:///./test.db":
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.abspath(os.path.join(base_dir, "..", "test.db"))
     DATABASE_URL = f"sqlite:///{db_path}"
