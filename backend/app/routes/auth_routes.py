@@ -404,4 +404,32 @@ def get_assistants(
         User.role == "lawyer",
         User.admin_id == admin_db_user.id
     ).all()
-    return assistants
+    return assistants
+
+
+@router.delete("/assistants/{assistant_id}")
+def delete_assistant(
+    assistant_id: int,
+    db: Session = Depends(get_db),
+    admin_user: dict = Depends(verify_token)
+):
+    admin_db_user = db.query(User).filter(User.id == admin_user["user_id"]).first()
+    if not admin_db_user or admin_db_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+
+    # Find assistant and verify they belong to this admin
+    assistant = db.query(User).filter(
+        User.id == assistant_id,
+        User.role == "lawyer",
+        User.admin_id == admin_db_user.id
+    ).first()
+
+    if not assistant:
+        raise HTTPException(status_code=404, detail="Assistant not found or not managed by you.")
+
+    db.delete(assistant)
+    db.commit()
+    return {"message": "Assistant removed successfully"}

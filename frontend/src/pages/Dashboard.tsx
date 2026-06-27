@@ -78,6 +78,16 @@ export default function Dashboard() {
   const [hearingFormError, setHearingFormError] = useState('');
   const [caseSearch, setCaseSearch] = useState('');
 
+  const [showAddAssistant, setShowAddAssistant] = useState(false);
+  const [asstSaving, setAsstSaving] = useState(false);
+  const [asstError, setAsstError] = useState('');
+  const [asstForm, setAsstForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    phone_number: ''
+  });
+
   // Today's To Do State
   const userId = localStorage.getItem('user_id') || 'default';
   const todoKey = `todo_tasks_${userId}`;
@@ -173,6 +183,47 @@ export default function Dashboard() {
     }
   };
 
+  const handleSaveAssistant = async () => {
+    if (!asstForm.full_name.trim() || !asstForm.email.trim() || !asstForm.password.trim()) {
+      setAsstError('Name, email, and password are required.');
+      return;
+    }
+    setAsstSaving(true);
+    setAsstError('');
+    try {
+      await api.post('/auth/register', {
+        full_name: asstForm.full_name.trim(),
+        email: asstForm.email.trim(),
+        password: asstForm.password.trim(),
+        phone_number: asstForm.phone_number.trim() || null
+      });
+      setShowAddAssistant(false);
+      setAsstForm({ full_name: '', email: '', password: '', phone_number: '' });
+
+      // Refresh list
+      const assistantsRes = await api.get('/auth/assistants');
+      setAssistants(assistantsRes.data);
+    } catch (err: any) {
+      setAsstError(err.response?.data?.detail || 'Failed to add assistant.');
+    } finally {
+      setAsstSaving(false);
+    }
+  };
+
+  const handleRemoveAssistant = async (id: number, name: string) => {
+    if (!window.confirm(`Are you sure you want to remove assistant "${name}"?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/auth/assistants/${id}`);
+      // Refresh list
+      const assistantsRes = await api.get('/auth/assistants');
+      setAssistants(assistantsRes.data);
+    } catch (err: any) {
+      alert(err.response?.data?.detail || 'Failed to remove assistant.');
+    }
+  };
+
   const handleSave = async () => {
     if (!form.case_title.trim()) { setFormError('Title is required.'); return; }
     setSaving(true); setFormError('');
@@ -226,20 +277,41 @@ export default function Dashboard() {
         {/* Assistant Lawyers (Admin Only) */}
         {isAdmin && (
           <div className="card dash-section assistants-section">
-            <h2 className="section-title">Assistant Lawyers ({assistants.length})</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 className="section-title" style={{ margin: 0 }}>Assistant Lawyers ({assistants.length})</h2>
+              <button 
+                type="button" 
+                className="btn btn-primary btn-sm"
+                onClick={() => {
+                  setAsstError('');
+                  setAsstForm({ full_name: '', email: '', password: '', phone_number: '' });
+                  setShowAddAssistant(true);
+                }}
+              >
+                + Add Assistant
+              </button>
+            </div>
             {assistants.length === 0 ? (
               <div className="empty-state"><span className="empty-icon">👥</span>No assistants registered</div>
             ) : (
               <div className="assistants-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '250px', overflowY: 'auto' }}>
                 {assistants.map(a => (
-                  <div key={a.id} className="assistant-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--bg-elevated)' }}>
+                  <div key={a.id} className="assistant-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--bg-elevated)' }}>
                     <div>
                       <div style={{ fontWeight: '600' }}>{a.full_name}</div>
                       <div className="text-dim" style={{ fontSize: '13px' }}>{a.email}</div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>📞 {a.phone_number || 'No phone'}</div>
                     </div>
-                    <div style={{ textAlign: 'right', fontSize: '13px', color: 'var(--text-muted)' }}>
-                      <div>📞 {a.phone_number || 'No phone'}</div>
-                      <div className="text-dim" style={{ fontSize: '11px' }}>ID: #{a.id}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                      <span className="text-dim" style={{ fontSize: '11px' }}>ID: #{a.id}</span>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        style={{ padding: '2px 8px', fontSize: '12px' }}
+                        onClick={() => handleRemoveAssistant(a.id, a.full_name)}
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -561,6 +633,61 @@ export default function Dashboard() {
               <button className="btn btn-secondary" onClick={() => setShowSchedule(false)}>Cancel</button>
               <button className="btn btn-primary" onClick={handleSaveHearing} disabled={hearingSaving} id="dashboard-new-hearing-save">
                 {hearingSaving ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddAssistant && (
+        <div className="modal-overlay" onClick={() => setShowAddAssistant(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">Add Assistant Lawyer</h2>
+            {asstError && <div className="alert alert-error">{asstError}</div>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div className="form-group">
+                <label className="form-label">Full Name *</label>
+                <input
+                  className="form-input"
+                  value={asstForm.full_name}
+                  onChange={e => setAsstForm({ ...asstForm, full_name: e.target.value })}
+                  placeholder="Assistant's name"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Email Address *</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  value={asstForm.email}
+                  onChange={e => setAsstForm({ ...asstForm, email: e.target.value })}
+                  placeholder="assistant@example.com"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Password *</label>
+                <input
+                  type="password"
+                  className="form-input"
+                  value={asstForm.password}
+                  onChange={e => setAsstForm({ ...asstForm, password: e.target.value })}
+                  placeholder="Password"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Phone Number</label>
+                <input
+                  className="form-input"
+                  value={asstForm.phone_number}
+                  onChange={e => setAsstForm({ ...asstForm, phone_number: e.target.value })}
+                  placeholder="123-456-7890"
+                />
+              </div>
+            </div>
+            <div className="modal-actions" style={{ marginTop: '20px' }}>
+              <button className="btn btn-secondary" onClick={() => setShowAddAssistant(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleSaveAssistant} disabled={asstSaving}>
+                {asstSaving ? 'Adding…' : 'Add Assistant'}
               </button>
             </div>
           </div>
