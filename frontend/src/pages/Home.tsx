@@ -70,7 +70,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="hero-section" style={{ backgroundImage: `linear-gradient(rgba(28, 28, 28, 0.85), rgba(28, 28, 28, 0.85)), url("/images/courtroom_hero.png")` }}>
+      <section className="hero-section">
         <motion.div 
           className="hero-content"
           initial={{ opacity: 0, y: 30 }}
