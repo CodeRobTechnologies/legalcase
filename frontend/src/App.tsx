@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Login    from './pages/Login';
@@ -62,20 +62,18 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
-        <Route path="/cases"     element={<ProtectedLayout><Cases /></ProtectedLayout>} />
-        <Route path="/hearings"  element={<ProtectedLayout><Hearings /></ProtectedLayout>} />
-        <Route path="/timeline"  element={<ProtectedLayout><Timeline /></ProtectedLayout>} />
-        <Route path="/preparation" element={<ProtectedLayout><PreparationList /></ProtectedLayout>} />
-        <Route path="/clients"    element={<ProtectedLayout><ClientDetails /></ProtectedLayout>} />
-        <Route path="/account"    element={<ProtectedLayout><AccountInfo /></ProtectedLayout>} />
-        <Route path="/documents" element={<ProtectedLayout><Documents /></ProtectedLayout>} />
-        <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
+      <Route path="/cases"     element={<ProtectedLayout><Cases /></ProtectedLayout>} />
+      <Route path="/hearings"  element={<ProtectedLayout><Hearings /></ProtectedLayout>} />
+      <Route path="/timeline"  element={<ProtectedLayout><Timeline /></ProtectedLayout>} />
+      <Route path="/preparation" element={<ProtectedLayout><PreparationList /></ProtectedLayout>} />
+      <Route path="/clients"    element={<ProtectedLayout><ClientDetails /></ProtectedLayout>} />
+      <Route path="/account"    element={<ProtectedLayout><AccountInfo /></ProtectedLayout>} />
+      <Route path="/documents" element={<ProtectedLayout><Documents /></ProtectedLayout>} />
+      <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
