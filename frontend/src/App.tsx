@@ -13,6 +13,8 @@ import ClientDetails from './pages/ClientDetails';
 import AccountInfo from './pages/AccountInfo';
 import Works from './pages/Works';
 import Assistants from './pages/Assistants';
+import Home from './pages/Home';
+import NotFound from './pages/NotFound';
 import Header from './components/Header';
 import api from './api/client';
 import { isAuthenticated } from './lib/auth';
@@ -82,8 +84,8 @@ export default function App() {
       <Route path="/assistants" element={<ProtectedLayout><Assistants /></ProtectedLayout>} />
       <Route path="/documents" element={<ProtectedLayout><Documents /></ProtectedLayout>} />
       <Route path="/works"     element={<ProtectedLayout><Works /></ProtectedLayout>} />
-      <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/"          element={<Home />} />
+      <Route path="*"          element={<NotFound />} />
     </Routes>
   );
 }

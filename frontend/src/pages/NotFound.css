@@ -1,0 +1,55 @@
+.notfound-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.notfound-card {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 48px 36px;
+  background: var(--bg-card);
+  border-top: 4px solid var(--primary);
+}
+
+.notfound-icon {
+  font-size: 64px;
+  background: var(--bg-elevated);
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.notfound-title {
+  font-size: 32px;
+  margin: 0;
+}
+
+.notfound-message {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--primary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.notfound-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 10px 0;
+}

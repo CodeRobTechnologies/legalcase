@@ -12,8 +12,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(79,70,229,0.25) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 80%, rgba(124,58,237,0.2) 0%, transparent 60%);
+    radial-gradient(ellipse at 30% 20%, rgba(200, 169, 106, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(140, 98, 57, 0.08) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -21,7 +21,7 @@
   position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   padding: 48px 40px;
   width: 100%;
   max-width: 420px;
@@ -37,7 +37,7 @@
 
 .login-icon {
   font-size: 40px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #D4AF37, #C8A96A);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -54,7 +54,7 @@
 
 .login-sub {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .login-form {
@@ -107,7 +107,7 @@
 }
 
 .role-tab.active {
-  background: var(--primary);
-  color: #fff;
+  background: linear-gradient(135deg, #D4AF37 0%, #C8A96A 100%);
+  color: #1C1C1C;
   box-shadow: var(--shadow-sm);
 }
