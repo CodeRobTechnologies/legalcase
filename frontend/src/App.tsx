@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Login    from './pages/Login';
@@ -30,6 +30,11 @@ console.log('[LegalCase Frontend App Startup]', {
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(isAuthenticated() && !localStorage.getItem('user_id'));
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (isAuthenticated() && !localStorage.getItem('user_id')) {
@@ -53,7 +58,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
       <div className="main-content">
-        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <Header onToggleSidebar={() => setSidebarOpen(true)} />
         <div className="page-body">{children}</div>
       </div>
     </div>
