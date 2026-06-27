@@ -15,6 +15,8 @@ if not DATABASE_URL or DATABASE_URL == "sqlite:///./test.db":
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+print(f"[Database] Active connection URL: {DATABASE_URL}")
+
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         DATABASE_URL,
