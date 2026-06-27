@@ -78,3 +78,36 @@
   color: var(--text-dim);
   margin-top: 28px;
 }
+
+.login-role-tabs {
+  display: flex;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.role-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: calc(var(--radius) - 2px);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.role-tab:hover {
+  color: var(--text);
+}
+
+.role-tab.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}

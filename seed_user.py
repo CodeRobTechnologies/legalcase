@@ -57,5 +57,21 @@ if not db.query(User).filter(User.email == alt_email).first():
     db.refresh(alt_user)
     print(f"Created alternate user with id {alt_user.id}")
 
+# Create an admin user
+admin_email = "admin@example.com"
+admin_pass = "admin123"
+if not db.query(User).filter(User.email == admin_email).first():
+    admin_user = User(
+        full_name="Admin Lawyer",
+        email=admin_email,
+        password=hash_password(admin_pass),
+        role="admin",
+        phone_number="123-456-7890",
+    )
+    db.add(admin_user)
+    db.commit()
+    db.refresh(admin_user)
+    print(f"Created admin user with id {admin_user.id}")
+
 db.close()
 

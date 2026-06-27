@@ -11,6 +11,7 @@ import Timeline from './pages/Timeline';
 import PreparationList from './pages/PreparationList';
 import ClientDetails from './pages/ClientDetails';
 import AccountInfo from './pages/AccountInfo';
+import Works from './pages/Works';
 import Header from './components/Header';
 import api from './api/client';
 import { isAuthenticated } from './lib/auth';
@@ -42,6 +43,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         .then(res => {
           localStorage.setItem('user_id', String(res.data.id));
           localStorage.setItem('user_email', res.data.email);
+          localStorage.setItem('user_role', res.data.role);
           setLoading(false);
         })
         .catch(() => {
@@ -77,6 +79,7 @@ export default function App() {
       <Route path="/clients"    element={<ProtectedLayout><ClientDetails /></ProtectedLayout>} />
       <Route path="/account"    element={<ProtectedLayout><AccountInfo /></ProtectedLayout>} />
       <Route path="/documents" element={<ProtectedLayout><Documents /></ProtectedLayout>} />
+      <Route path="/works"     element={<ProtectedLayout><Works /></ProtectedLayout>} />
       <Route path="/" element={<Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

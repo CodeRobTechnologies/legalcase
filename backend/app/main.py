@@ -51,6 +51,10 @@ from app.models.document_model import (
     Document
 )
 
+from app.models.work_model import (
+    Work
+)
+
 
 
 # =========================
@@ -83,6 +87,10 @@ from app.routes.document_routes import (
 
 from app.routes.dashboard_routes import (
     router as dashboard_router
+)
+
+from app.routes.work_routes import (
+    router as work_router
 )
 
 # Websocket router removed as it is duplicated by notification_routes
@@ -267,6 +275,8 @@ app.include_router(notification_router)
 app.include_router(document_router)
 
 app.include_router(dashboard_router)
+
+app.include_router(work_router)
 
 # app.include_router(websocket_router)
 

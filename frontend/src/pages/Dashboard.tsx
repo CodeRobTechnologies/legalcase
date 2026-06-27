@@ -16,6 +16,8 @@ type Analytics = {
 
 type RecentCase = { id: number; title: string; case_number?: string | null; status: string; lawyer_id: number | null };
 
+type Assistant = { id: number; full_name: string; email: string; phone_number: string };
+
 type TodoTask = {
   id: string;
   title: string;
@@ -59,7 +61,11 @@ export default function Dashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [recentCases, setRecentCases] = useState<RecentCase[]>([]);
   const [cases, setCases] = useState<{ id: number; case_title: string; case_number?: string | null }[]>([]);
+  const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const userRole = localStorage.getItem('user_role') || 'lawyer';
+  const isAdmin = userRole === 'admin';
   const [error, setError] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<CaseForm>(EMPTY);
@@ -124,6 +130,11 @@ export default function Dashboard() {
       setAnalytics(dashRes.data.analytics);
       setRecentCases(dashRes.data.recent_cases);
       setCases(casesRes.data);
+
+      if (isAdmin) {
+        const assistantsRes = await api.get('/auth/assistants');
+        setAssistants(assistantsRes.data);
+      }
     } catch {
       setError('Failed to load dashboard data.');
     } finally {
@@ -212,6 +223,31 @@ export default function Dashboard() {
       </div>
 
       <div className="dash-bottom">
+        {/* Assistant Lawyers (Admin Only) */}
+        {isAdmin && (
+          <div className="card dash-section assistants-section">
+            <h2 className="section-title">Assistant Lawyers ({assistants.length})</h2>
+            {assistants.length === 0 ? (
+              <div className="empty-state"><span className="empty-icon">👥</span>No assistants registered</div>
+            ) : (
+              <div className="assistants-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '250px', overflowY: 'auto' }}>
+                {assistants.map(a => (
+                  <div key={a.id} className="assistant-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--bg-elevated)' }}>
+                    <div>
+                      <div style={{ fontWeight: '600' }}>{a.full_name}</div>
+                      <div className="text-dim" style={{ fontSize: '13px' }}>{a.email}</div>
+                    </div>
+                    <div style={{ textAlign: 'right', fontSize: '13px', color: 'var(--text-muted)' }}>
+                      <div>📞 {a.phone_number || 'No phone'}</div>
+                      <div className="text-dim" style={{ fontSize: '11px' }}>ID: #{a.id}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Recent Cases */}
         <div className="card dash-section">
           <h2 className="section-title">Recent Cases</h2>

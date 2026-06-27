@@ -10,6 +10,7 @@ const NAV = [
   { to: '/preparation', icon: '📋', label: 'Preparation List' },
   { to: '/clients',    icon: '👥', label: 'Client Details' },
   { to: '/documents', icon: '📄', label: 'Documents' },
+  { to: '/works',     icon: '💼', label: 'Works' },
   { to: '/account',   icon: '👤', label: 'Account Info' },
 ];
 

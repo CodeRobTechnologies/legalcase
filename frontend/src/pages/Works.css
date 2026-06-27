@@ -1,0 +1,43 @@
+.works-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.works-list {
+  padding: 0;
+  overflow: hidden;
+}
+
+.work-title-cell {
+  color: var(--text);
+}
+
+.work-desc-cell {
+  color: var(--text-muted);
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-toggle-btn {
+  background: transparent;
+  border: 1px solid currentColor;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.status-toggle-btn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .work-desc-cell {
+    max-width: 150px;
+  }
+}

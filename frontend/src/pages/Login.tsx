@@ -5,10 +5,22 @@ import './Login.css';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
+  const [roleMode, setRoleMode] = useState<'assistant' | 'admin'>('assistant');
+  const [email, setEmail]       = useState('lawyer@example.com');
+  const [password, setPassword] = useState('Password123!');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+
+  const handleRoleChange = (mode: 'assistant' | 'admin') => {
+    setRoleMode(mode);
+    if (mode === 'assistant') {
+      setEmail('lawyer@example.com');
+      setPassword('Password123!');
+    } else {
+      setEmail('admin@example.com');
+      setPassword('admin123');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +46,7 @@ export default function Login() {
         if (res.data.user) {
           localStorage.setItem('user_id', String(res.data.user.id));
           localStorage.setItem('user_email', res.data.user.email);
+          localStorage.setItem('user_role', res.data.user.role);
         }
         navigate('/dashboard');
       } else {
@@ -60,6 +73,23 @@ export default function Login() {
           <span className="login-icon">⚖</span>
           <h1 className="login-title">LegalCase</h1>
           <p className="login-sub">Sign in to your account</p>
+        </div>
+
+        <div className="login-role-tabs">
+          <button
+            type="button"
+            className={`role-tab ${roleMode === 'assistant' ? 'active' : ''}`}
+            onClick={() => handleRoleChange('assistant')}
+          >
+            Assistant Login
+          </button>
+          <button
+            type="button"
+            className={`role-tab ${roleMode === 'admin' ? 'active' : ''}`}
+            onClick={() => handleRoleChange('admin')}
+          >
+            Admin Login
+          </button>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}

@@ -19,9 +19,11 @@ from app.models.user_model import (
     User
 )
 
+from typing import List
 from app.schemas.user_schema import (
     UserCreate,
-    UserLogin
+    UserLogin,
+    UserResponse
 )
 
 from app.services.auth_service import (
@@ -362,4 +364,22 @@ def update_user_role(
     db.commit()
     db.refresh(target_user)
     
-    return {"message": "User role updated successfully", "user_id": target_user.id, "new_role": target_user.role}
+    return {"message": "User role updated successfully", "user_id": target_user.id, "new_role": target_user.role}
+
+# =========================
+# GET ALL ASSISTANTS (LAWYERS)
+# =========================
+@router.get("/assistants", response_model=List[UserResponse])
+def get_assistants(
+    db: Session = Depends(get_db),
+    admin_user: dict = Depends(verify_token)
+):
+    admin_db_user = db.query(User).filter(User.id == admin_user["user_id"]).first()
+    if not admin_db_user or admin_db_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    # Assistants are all users with role "lawyer"
+    assistants = db.query(User).filter(User.role == "lawyer").all()
+    return assistants
