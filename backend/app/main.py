@@ -169,6 +169,41 @@ async def lifespan(app: FastAPI):
         "Database tables created successfully"
     )
 
+    # AUTO-SEED ADMIN USER
+    from app.database import SessionLocal
+    from app.models.user_model import User
+    from app.services.auth_service import hash_password
+
+    db = SessionLocal()
+    try:
+        admin_email = "admin@example.com"
+        admin_pass = "admin123"
+        admin_exists = db.query(User).filter(User.role == "admin").first()
+        if not admin_exists:
+            email_exists = db.query(User).filter(User.email == admin_email).first()
+            if not email_exists:
+                admin_user = User(
+                    full_name="Admin Lawyer",
+                    email=admin_email,
+                    password=hash_password(admin_pass),
+                    role="admin",
+                    phone_number="123-456-7890",
+                )
+                db.add(admin_user)
+                db.commit()
+                db.refresh(admin_user)
+                print(f"[Lifespan Seed] Created default admin user: {admin_email}")
+            else:
+                email_exists.role = "admin"
+                db.commit()
+                print(f"[Lifespan Seed] Updated existing user {admin_email} to admin role")
+        else:
+            print(f"[Lifespan Seed] Admin user already exists: {admin_exists.email}")
+    except Exception as e:
+        print(f"[Lifespan Seed] Error auto-seeding admin: {e}")
+    finally:
+        db.close()
+
     yield
 
     print(
